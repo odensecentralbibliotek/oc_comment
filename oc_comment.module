@@ -46,7 +46,7 @@ function oc_comment_menu() {
   $items['nyheder/oc/comments/ajax_form/reply/submit/%/%/%'] = array(
     'page callback' => 'oc_comment_ajax_reply_submit_form', // Render HTML
     'description' => 'handles form submit.',
-    'page arguments' => array(5,6,7),
+    'page arguments' => array(6,7,8),
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
@@ -304,7 +304,7 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body)
         $comment->name = $user->name; // If user is authenticated you can omit this field, it will be auto-populated, if the user is anonymous and you want to name him somehow, input his name here
         //$comment->thread = '01/'; // OPTIONAL. If you need comments to be threaded you can fill this value. Otherwise omit it.
         //$comment->hostname = '127.0.01' // OPTIONAL. You can log poster's ip here
-        $comment->created = time(); // OPTIONAL. You can set any time you want here. Useful for backdated comments creation.
+        //$comment->created = time(); // OPTIONAL. You can set any time you want here. Useful for backdated comments creation.
         $comment->is_anonymous = 0; // leave it as is
         $comment->homepage = ''; // you can add homepage URL here
         $comment->status = user_access('skip comment approval') ? COMMENT_PUBLISHED : COMMENT_NOT_PUBLISHED; // We auto-publish this comment
