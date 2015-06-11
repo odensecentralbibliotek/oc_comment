@@ -1,0 +1,380 @@
+<?php
+require_once('oc_comment_forms.php');
+require_once('oc_comment_popups.php');
+require_once('oc_comment_helpers.php');
+require_once('oc_comment.admin.php');
+
+function oc_comment_menu() {
+     $items['admin/oc/comments/config'] = array(
+    'title' => 'Current posts',
+    'description' => 'Configuration for Current posts module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('oc_comment_config_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+    
+    $items['oc/comments/ajax/get'] = array(
+    'page callback' => 'oc_comment_block_view', // Render HTML
+    'description' => 'Gets Bulk place2book status for nodes',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+   );
+    
+  $items['oc/comments/save/ajax/%'] = array(
+    'page callback' => 'oc_comment_callback', // Render HTML
+    'description' => 'Gets Bulk place2book status for nodes',
+    'page arguments' => array(4),
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+   );
+  
+    $items['oc/comments/ajax_form/login'] = array(
+    'page callback' => 'oc_comment_ajax_login_popup', // Render HTML
+    'description' => 'Opens Login box.',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+   );
+    
+  $items['oc/comments/ajax_form/reply'] = array(
+    'page callback' => 'oc_comment_ajax_reply_popup', // Render HTML
+    'description' => 'opens reply box.',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+   );
+  
+  $items['oc/comments/ajax_form/reply/submit/%/%/%'] = array(
+    'page callback' => 'oc_comment_ajax_reply_submit_form', // Render HTML
+    'description' => 'handles form submit.',
+    'page arguments' => array(5,6,7),
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+   );
+  
+    $items['oc/comments/ajax_form/edit'] = array(
+    'page callback' => 'oc_comment_ajax_edit_popup', // Render HTML
+    'description' => 'opens edit popup.',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+   );
+    
+  $items['oc/comments/ajax_form/edit/submit/%/%'] = array(
+    'page callback' => 'oc_comment_ajax_edit_submit_form', // Render HTML
+    'description' => 'saves comment edits',
+    'page arguments' => array(5,6),
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+   );
+  
+    $items['oc/comments/ajax_form/delete/submit/%'] = array(
+    'page callback' => 'oc_comment_ajax_delete_submit_form', // Render HTML
+    'description' => 'deletes comment',
+    'page arguments' => array(5),
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+   );
+    
+   $items['oc/comments/ajax_form/delete'] = array(
+    'page callback' => 'oc_comment_ajax_delete_popup', // Render HTML
+    'description' => 'deletes comment popup confirm',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+   );
+  return $items;
+}
+/**
+ * Implements hook_block_info().
+ */
+function oc_comment_block_info() {
+  $blocks = array();
+  $blocks['oc_comments_block'] = array(
+    'info' => t('oc comments block'),
+  );
+  return $blocks;
+}
+/**
+ * Implements hook_block_configure().
+ */
+function oc_comment_block_configure($delta='') {
+   
+
+   
+}
+/**
+ * Implements hook_block_view().
+ * Builds a better data structure and renders
+ * the build in comments module is horrible to work with and the treading is poor at bedst.
+ */
+function oc_comment_block_view($delta='') {
+    $ajax = 0;
+    if(isset($_GET["ajax"]) && $_GET["ajax"] ==  1)
+    {
+        /*
+         * setup needed vars todo the ajax request.
+         */
+        $ajax = 1;
+        $node = node_load($_GET["nodeid"]);
+        $delta = "oc_comments_block";
+        unset($_GET["ajax"]);
+        unset($_GET["nodeid"]);
+    }
+    else
+    {
+        $node = menu_get_object();
+    }  
+
+    $setting = array('oc_comment' => array('currentNid' => $node->nid));
+    drupal_add_js($setting, 'setting');
+    drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/oc_comments.js');
+    drupal_add_css(drupal_get_path('module', 'oc_comment') . '/css/oc_comment.css');
+
+    //Get the comments of the current node.
+    $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
+    $max_reply_level = variable_get('oc_comment_max_reply_level', 0);
+    $Comments_render_arrary = oc_comments_build_comment_array($node);
+    
+    // Initialize the pager
+    $block = array();
+    switch($delta) {
+      case 'oc_comments_block' :
+        $block['content'] = GenerateHtmlContent($Comments_render_arrary);
+        break;
+    }
+    $tmp = current_path();
+    if($ajax ==  1)
+    {
+        drupal_json_output($block);
+        drupal_exit();
+    }
+    else
+    {
+        return $block;
+    }
+}
+/*
+ * Genarate all the needed html to display the comment block properly.
+ */
+function GenerateHtmlContent($comments)
+{
+    $per_page = variable_get('oc_comment_pr_page' , 5);
+    
+    $current_page = pager_default_initialize(count($comments), $per_page);
+    // Split your list into page sized chunks
+    $chunks = array_chunk($comments, $per_page, TRUE);
+    
+    $html = "<div id='oc_comments_wrap'>";
+    /*if(!user_is_logged_in())
+    {
+        $html .= l(t('Login To Comment'),'',array('attributes' => array('class' => 'oc_comment_login_btn',
+         'id' => $comment->cid)));
+    }*/
+    $level = 1;
+    foreach($chunks[$current_page] as $index => $comment)
+    {
+        if($comment->parent->status == 1)
+        {
+            $html .= render_single_comment_entity($comment,0);
+            $html .= recursive_render_comment_children($comment->children,$comment);
+        }
+    }
+    $html .= theme('pager', array('quantity',count($comments)));
+    $html .= "</div>";
+    
+    return $html;
+}
+/*
+ * Recursively generate html for all child codes in the array.
+ * children always start at level 1
+ */
+function recursive_render_comment_children($children,$parent_comment,$current_level = 1)
+{
+    if(sizeof($children))
+    {
+        $html = "<div class='indented'>";
+        foreach($children as $index => $comment)
+        {
+
+            $html .= render_single_comment_entity($comment,$current_level,true);
+            
+            //Node has children. render these aswell.
+            if(sizeof($comment->children) && $current_level < variable_get('oc_comment_max_reply_level', 1))
+            {
+                $html .= recursive_render_comment_children($comment->children,$comment->parent,$current_level+1);
+            }
+
+        }
+        $html .= "</div>";
+        return $html;
+    }
+    else
+    {
+        return "";
+    }
+}
+/*
+ * Build the comment box toolbar.
+ */
+function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
+{
+    global $user;
+    //if current user is logged in
+    $button_html = "";
+    if(user_is_logged_in())
+    {
+        //is own comment ?
+        if($user->uid == $comment->uid)
+        {
+            /*
+             * User can post new/reply to comments.
+             * always check if the current level allows reply's !
+             *
+             */
+            $tmp = variable_get('oc_comment_max_reply_level', 1);
+            if(user_access('post comments')  && $current_level < $tmp)
+            {
+                $button_html .= l(t('reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
+                'id' => $comment->cid)));
+            }
+            /*
+             * User can edit his own comments.
+             */
+            if(user_access('edit own comments'))
+            {
+                $button_html .= l(t('Edit'),'',array('attributes' => array('class' => 'oc_comment_edit_btn oc_comment_btn',
+                 'id' => $comment->cid)));
+            }
+            /*
+             * User can post new/reply to comments.
+             */
+            if(user_access('administer comments'))
+            {
+                $button_html .= l(t('Delete'),'',array('attributes' => array('class' => 'oc_comment_delete_btn oc_comment_btn' ,
+                'id' => $comment->cid)));
+            }
+        }
+        else
+        {
+            /*
+             * User can post new/reply to comments.
+             * always check if the current level allows reply's !
+             */
+            if(user_access('post comments') && $current_level < variable_get('oc_comment_max_reply_level', 1))
+            {
+                $button_html .= l(t('reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
+                'id' => $comment->cid)));
+            }
+            /*
+             * User can post new/reply to comments.
+             */
+            if(user_access('administer comments'))
+            {
+                    $button_html .= l(t('Delete'),'',array('attributes' => array('class' => 'oc_comment_delete_btn oc_comment_btn',
+                    'id' => $comment->cid)));
+
+                    $button_html .= l(t('Edit'),'',array('attributes' => array('class' => 'oc_comment_edit_btn oc_comment_btn',
+                    'id' => $comment->cid)));
+            }
+        }
+    }
+    else
+    {
+        
+    }
+    return $button_html;
+}
+/*
+ * Handles creating new comments.
+ */
+function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body)
+{
+    //echo "Nodeid: " . $nodeid;
+    //echo "parent: " . $parentid;
+    //echo "comment: " . $comment_body;
+    global $language;
+    global $user;
+    $current_level = 1;
+    if(strlen($comment_body) > 0)
+    {
+        $comment = new stdClass();
+        $comment->nid = $nodeid; // nid of a node you want to attach a comment to
+        $comment->cid = 0; // leave it as is
+        $comment->pid = $parentid != -1 ? $parentid : 0; // parent comment id, 0 if none 
+        $comment->uid = $user->uid; // user's id, who left the comment
+        $comment->mail = 'email@example.com'; // user's email
+        $comment->name = $user->name; // If user is authenticated you can omit this field, it will be auto-populated, if the user is anonymous and you want to name him somehow, input his name here
+        //$comment->thread = '01/'; // OPTIONAL. If you need comments to be threaded you can fill this value. Otherwise omit it.
+        //$comment->hostname = '127.0.01' // OPTIONAL. You can log poster's ip here
+        $comment->created = time(); // OPTIONAL. You can set any time you want here. Useful for backdated comments creation.
+        $comment->is_anonymous = 0; // leave it as is
+        $comment->homepage = ''; // you can add homepage URL here
+        $comment->status = user_access('skip comment approval') ? COMMENT_PUBLISHED : COMMENT_NOT_PUBLISHED; // We auto-publish this comment
+        $comment->language = LANGUAGE_NONE; // The same as for a node
+        $comment->subject = 'No subject'; 
+        $comment->node_type = 'comment_node_ding_news';
+        $comment->field_comment_body[LANGUAGE_NONE][0]['value'] = $comment_body; // Everything here is pretty much like with a node
+        $comment->field_comment_body[LANGUAGE_NONE][0]['format'] = 3; 
+        //$comment->field_custom_field_name[LANGUAGE_NONE][0]['value'] = ‘Some value’; // OPTIONAL. If your comment has a custom field attached it can added as simple as this // preparing a comment for a save
+        
+        $entity = entity_create('comment', (array)$comment);
+        $entity = entity_metadata_wrapper('comment',  $entity);
+        $entity->save();
+        //get the saved comments id.
+        $comment->cid = $entity->getIdentifier();
+        
+        /*
+         * Hack so we can use 1 function to render...
+         */
+        $obj = new stdClass;
+        $obj->parent = $comment;
+        $obj->children = array();
+                
+        $comment->markup = render_single_comment_entity($obj,$current_level,true);
+        drupal_json_output($comment);
+        
+    }
+    drupal_exit();
+}
+/*
+ * Handles editing comment.
+ */
+function oc_comment_ajax_edit_submit_form($cid,$comment_body)
+{
+    $entity = reset(entity_load('comment',array($cid)));
+    
+    if($entity->field_comment_body[LANGUAGE_NONE][0]['value'] != $comment_body)
+    {
+        $entity->field_comment_body[LANGUAGE_NONE][0]['value'] =  $comment_body;
+        $entity_wrap = entity_metadata_wrapper('comment',  $entity);
+        if($entity_wrap->save())
+        {
+            drupal_json_output($entity);
+            drupal_exit();
+        }
+        else
+        {
+            echo "0";
+            drupal_exit();
+        }
+    }
+}
+/*
+ * Delete Comment and if needed all its children.
+ */
+function oc_comment_ajax_delete_submit_form($cid)
+{
+    /*
+     * It always returns null. as the comment entity does not seem
+     * to be compatible with the CRUD api. 
+     * see: http://www.drupalcontrib.org/api/drupal/contributions!entity!entity.module/function/entity_delete_multiple/7
+     */
+    $success = entity_delete('comment', $cid);
+    if(!$success)
+    {
+        echo "1";
+    }
+    else
+    {
+        echo "0";
+    }
+    drupal_exit();
+}

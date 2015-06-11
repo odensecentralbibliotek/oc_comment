@@ -1,0 +1,81 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 19-05-2015, 09:07:56
+    Author     : amer
+*/
+/** Comments **/
+.comment {
+  border: 1px dashed #69c8cf;
+  border-radius: 10px;
+  border-top-left-radius: 0px;
+  margin: 10px;
+  padding: 5px;
+  float:left;
+  width: 97%;
+}
+#comment_logo
+{
+    float: right;
+    width: 25px;
+    height: 25px;
+}
+.oc_comment_child
+{
+    margin:4px;
+}
+.comment-new {
+    background: aliceblue;
+}
+
+.comment .links a {
+    background: #C7EAED;
+    padding: 4px;
+    color: black;
+    border-radius: 4px;
+    border: 1px solid lightgray;
+
+    margin-left: 3px;
+}
+.oc_comment_btn
+{
+    background: #C7EAED;
+    padding: 4px;
+    color: black;
+    border-radius: 4px;
+    border: 1px solid lightgray;
+    float: right;
+    margin-left: 3px;
+}
+.comment-form .form-textarea {
+  resize:none;
+}
+
+.comment h3 {
+    display: none;
+}
+.comment-form .form-submit {
+  float: right;
+  background: #C7EAED;
+  border-radius: 8px;
+  border: 1px solid lightgray;
+  margin-top: -29px;
+  padding: 2px 10px 2px 10px;
+  margin-right: 10px;
+}
+.comment-legend {
+  float: right;
+  color: #69c8cf;
+  font-weight: 700;
+}
+.indented
+{
+    display:none;
+}
+.oc_comment_btn
+{
+   cursor: pointer;
+}
