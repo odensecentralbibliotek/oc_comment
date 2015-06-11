@@ -43,7 +43,7 @@ function oc_comment_menu() {
     'access arguments' => array('access content'),
    );
   
-  $items['oc/comments/ajax_form/reply/submit/%/%/%'] = array(
+  $items['nyheder/oc/comments/ajax_form/reply/submit/%/%/%'] = array(
     'page callback' => 'oc_comment_ajax_reply_submit_form', // Render HTML
     'description' => 'handles form submit.',
     'page arguments' => array(5,6,7),
