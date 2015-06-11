@@ -72,7 +72,7 @@ function oc_comment_get_comment_body($cid)
     {
         return "";
     }
-    $node_content = db_query('SELECT field_comment_body_value FROM field_revision_field_comment_body WHERE entity_id = :cid ',array(':cid' => $cid));
+    $node_content = db_query('SELECT field_comment_body_value FROM field_data_field_comment_body WHERE entity_id = :cid ',array(':cid' => $cid));
     foreach($node_content as $index => $value)
     {
         if($index == 'field_comment_body_value')
