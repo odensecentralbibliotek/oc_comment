@@ -103,7 +103,7 @@ function render_single_comment_entity($entity,$current_level,$is_child = false)
     $html.= "<div class='content'>".oc_comment_get_comment_body($entity->parent->cid)."</div>";
     $html.= "<div style='text-align: right !important' class='comment_toolbar'>";
     //Is current level allowed to comment ? if not then dont display comment count
-    if($current_level < variable_get('oc_comment_max_reply_level', 1))
+    if($current_level < variable_get('oc_comment_max_reply_level', 1) && sizeof($entity->children) != 0)
     {
         $html.= '<a class="oc_comment_btn oc_comment_read_btn">'.sizeof($entity->children).' kommentare</a>';
     }
