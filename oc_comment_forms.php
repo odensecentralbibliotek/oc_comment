@@ -7,7 +7,8 @@ function oc_comment_comment_ajax_reply_form($form, &$form_state) {
     '#type' => 'textarea', //you can find a list of available types in the form api
     '#size' => 50,
     '#required' => TRUE, //make this field required
-    '#name' => 'comment_message'
+    '#name' => 'comment_message',
+    '#id' => 'reply_comment_message'
   );
   $form['#action'] = "/oc/comments/ajax_form/reply/submit"; //the submit will be hijacked by javascript.
   
@@ -28,7 +29,8 @@ function oc_comment_comment_ajax_edit_form($form, &$form_state) {
     '#type' => 'textarea', //you can find a list of available types in the form api
     '#size' => 50,
     '#required' => TRUE, //make this field required
-    '#name' => 'comment_message'
+    '#name' => 'edit_comment_message',
+    '#id' => 'edit_comment_message'
   );
   $form['#action'] = "/oc/comments/ajax_form/reply/edit"; //the submit will be hijacked by javascript.
   

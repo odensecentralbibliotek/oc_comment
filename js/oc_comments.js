@@ -118,7 +118,7 @@ function bindReplyajax()
         //Get the current comment id being replied too.
         var node_id = Drupal.settings.oc_comment.currentNid; 
         var parentid = Drupal.settings.oc_comment.selected_comment;
-        var comment = document.getElementById("edit-comment-message").value;
+        var comment = document.getElementById("reply_comment_message").value;
         var comment_level = "";
         //If id is -1 then we are creating a top-level comment.
         //This is safe as no comment id's are negative.
@@ -171,12 +171,14 @@ function bindDeleteajax()
      //The button hook.
      jQuery('.oc_comment_delete_btn').off();
      jQuery('.oc_comment_delete_btn').on('click',function(e){
+         //clean up the dynamic dialogs.
          debugger;
         jQuery.ajax({
           method: "GET",
           url: "/oc/comments/ajax_form/delete"
         })
           .done(function( msg ) {
+           
             debugger;
            //Show the Login in a dialog.
            var tmp = e.currentTarget.getAttribute('id');
@@ -190,8 +192,8 @@ function bindDeleteajax()
     });
     //Dialog submit.
     jQuery(document.body).on('click','#oc_comment_submit_delete_confirm_btn',function(e){
-      //clean up the dynamic dialogs.
-      jQuery('.ui-dialog').remove();
+
+
       //Get the current comment id being replied too.
       var comment_edit_id = Drupal.settings.oc_comment.selected_comment;
       //If id is -1 then we are creating a top-level comment.
@@ -218,29 +220,36 @@ function bindEditajax()
     //Add so the popup opens
       jQuery('.oc_comment_edit_btn').off();
       jQuery('.oc_comment_edit_btn').on('click',function(e){
+
          debugger;
         jQuery.ajax({
           method: "GET",
           url: "/oc/comments/ajax_form/edit"
         })
           .done(function( msg ) {
+            jQuery('#oc-comment-comment-ajax-edit-form').remove();
             debugger;
            //Show the Login in a dialog.
            var tmp = e.currentTarget.getAttribute('id');
+           var old_text = jQuery( e.currentTarget).parent().parent().find('.content').text();
            Drupal.settings.oc_comment.selected_comment = tmp;
+           Drupal.settings.oc_comment.selected_comment_old_text = old_text;
            var tmp = jQuery(msg);
            tmp.dialog({ title: "Edit comment",
                      modal: true
                  });
+            var tmp = jQuery('#edit_comment_message');
+            tmp.val(old_text);
+            
           });
           return false;
     });
     //Add the submit btn handler.
       jQuery(document.body).on('click','#oc_comment_submit_edit_btn',function(e){
+        jQuery('.ui-dialog').remove();
         //Get the current comment id being replied too.
-         
         var comment_edit_id = Drupal.settings.oc_comment.selected_comment;
-        var comment = jQuery('#edit-comment-message').val();
+        var comment = jQuery('#edit_comment_message').val();
         //If id is -1 then we are creating a top-level comment.
         //This is safe as no comment id's are negative.
         jQuery.ajax({
@@ -254,7 +263,6 @@ function bindEditajax()
                tmp2.text(comment);
                //If success inject the new comment @ correct place.
                jQuery('#oc-comment-comment-ajax-edit-form').dialog('close');
-               jQuery('#oc-comment-comment-ajax-edit-form').remove();
             });
         
         return false;
