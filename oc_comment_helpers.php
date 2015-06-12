@@ -75,7 +75,7 @@ function oc_comment_get_comment_body($cid)
     $comment = entity_load('comment',array($cid));
     $comment = reset($comment);
     $entity = entity_metadata_wrapper('comment',   $comment);
-    return $entity->field_comment_body->value();
+    return $entity->comment_body->value();
 }
 function render_single_comment_entity($entity,$current_level,$is_child = false)
 {

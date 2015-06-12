@@ -122,17 +122,23 @@ function oc_comment_block_view($delta='') {
     {
         $node = menu_get_object();
     }  
+    $Comments_render_arrary = array();
+    if($node->comment == COMMENT_NODE_HIDDEN)
+    {
+        
+    }
+    if($node->comment == COMMENT_NODE_OPEN)
+    {
+        $setting = array('oc_comment' => array('currentNid' => $node->nid));
+        drupal_add_js($setting, 'setting');
+        drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/oc_comments.js');
+        drupal_add_css(drupal_get_path('module', 'oc_comment') . '/css/oc_comment.css');
 
-    $setting = array('oc_comment' => array('currentNid' => $node->nid));
-    drupal_add_js($setting, 'setting');
-    drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/oc_comments.js');
-    drupal_add_css(drupal_get_path('module', 'oc_comment') . '/css/oc_comment.css');
-
-    //Get the comments of the current node.
-    $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
-    $max_reply_level = variable_get('oc_comment_max_reply_level', 0);
-    $Comments_render_arrary = oc_comments_build_comment_array($node);
-    
+        //Get the comments of the current node.
+        $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
+        $max_reply_level = variable_get('oc_comment_max_reply_level', 0);
+        $Comments_render_arrary = oc_comments_build_comment_array($node);
+    }
     // Initialize the pager
     $block = array();
     switch($delta) {
@@ -304,15 +310,15 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body)
         $comment->name = $user->name; // If user is authenticated you can omit this field, it will be auto-populated, if the user is anonymous and you want to name him somehow, input his name here
         //$comment->thread = '01/'; // OPTIONAL. If you need comments to be threaded you can fill this value. Otherwise omit it.
         //$comment->hostname = '127.0.01' // OPTIONAL. You can log poster's ip here
-        //$comment->created = time(); // OPTIONAL. You can set any time you want here. Useful for backdated comments creation.
+        $comment->created = time(); // OPTIONAL. You can set any time you want here. Useful for backdated comments creation.
         $comment->is_anonymous = 0; // leave it as is
         $comment->homepage = ''; // you can add homepage URL here
         $comment->status = user_access('skip comment approval') ? COMMENT_PUBLISHED : COMMENT_NOT_PUBLISHED; // We auto-publish this comment
         $comment->language = LANGUAGE_NONE; // The same as for a node
         $comment->subject = 'No subject'; 
         $comment->node_type = 'comment_node_ding_news';
-        $comment->field_comment_body[LANGUAGE_NONE][0]['value'] = $comment_body; // Everything here is pretty much like with a node
-        $comment->field_comment_body[LANGUAGE_NONE][0]['format'] = 3; 
+        $comment->comment_body[LANGUAGE_NONE][0]['value'] = $comment_body; // Everything here is pretty much like with a node
+        $comment->comment_body[LANGUAGE_NONE][0]['format'] = 3; 
         //$comment->field_custom_field_name[LANGUAGE_NONE][0]['value'] = ‘Some value’; // OPTIONAL. If your comment has a custom field attached it can added as simple as this // preparing a comment for a save
         
         $entity = entity_create('comment', (array)$comment);
