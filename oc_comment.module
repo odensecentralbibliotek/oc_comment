@@ -345,9 +345,9 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
 {
     $entity = reset(entity_load('comment',array($cid)));
     
-    if($entity->field_comment_body[LANGUAGE_NONE][0]['value'] != $comment_body)
+    if($entity->comment_body[LANGUAGE_NONE][0]['value'] != $comment_body)
     {
-        $entity->field_comment_body[LANGUAGE_NONE][0]['value'] =  $comment_body;
+        $entity->comment_body[LANGUAGE_NONE][0]['value'] =  $comment_body;
         $entity_wrap = entity_metadata_wrapper('comment',  $entity);
         if($entity_wrap->save())
         {
