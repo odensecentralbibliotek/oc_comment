@@ -122,7 +122,8 @@ function bindReplyajax()
         //This is safe as no comment id's are negative.
         jQuery.ajax({
             method: "GET",
-            url: "/nyheder/oc/comments/ajax_form/reply/submit/" + node_id +"/"+ parentid +"/" + comment + "/"
+            url: "/oc/comments/ajax_form/reply/submit/" + node_id +"/"+ parentid +"/" + comment 
+            //url: "/oc/comments/ajax_form/reply/submit/"
           })
             .done(function( msg ) {
                 debugger;
