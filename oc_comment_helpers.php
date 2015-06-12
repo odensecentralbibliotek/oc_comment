@@ -98,6 +98,7 @@ function render_single_comment_entity($entity,$current_level,$is_child = false)
             break;
         }
     }
+    $html.= "<input type='hidden' id='comment_level' value='".$current_level."' />";
     $html.= "<div class='submitted'>" . $full_name . " - " . date("d-m-Y H:i", $entity->parent->created). "</div>";
     $html.= "<div class='content'>".oc_comment_get_comment_body($entity->parent->cid)."</div>";
     $html.= "<div style='text-align: right !important' class='comment_toolbar'>";

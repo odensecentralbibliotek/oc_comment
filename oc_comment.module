@@ -43,10 +43,10 @@ function oc_comment_menu() {
     'access arguments' => array('access content'),
    );
   
-  $items['oc/comments/ajax_form/reply/submit/%/%/%'] = array(
+  $items['oc/comments/ajax_form/reply/submit/%/%/%/%'] = array(
     'page callback' => 'oc_comment_ajax_reply_submit_form', // Render HTML
     'description' => 'handles form submit.',
-    'page arguments' => array(5,6,7),
+    'page arguments' => array(5,6,7,8),
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
@@ -163,7 +163,6 @@ function oc_comment_block_view($delta='') {
 function GenerateHtmlContent($comments)
 {
     $per_page = variable_get('oc_comment_pr_page' , 5);
-    
     $current_page = pager_default_initialize(count($comments), $per_page);
     // Split your list into page sized chunks
     $chunks = array_chunk($comments, $per_page, TRUE);
@@ -291,14 +290,13 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
 /*
  * Handles creating new comments.
  */
-function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body)
+function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$current_level)
 {
     //echo "Nodeid: " . $nodeid;
     //echo "parent: " . $parentid;
     //echo "comment: " . $comment_body;
     global $language;
     global $user;
-    $current_level = 1;
     if(strlen($comment_body) > 0)
     {
         $comment = new stdClass();

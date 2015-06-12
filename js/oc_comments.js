@@ -101,7 +101,9 @@ function bindReplyajax()
           debugger;
          jQuery('#oc-comment-comment-ajax-reply-form').remove();
          var tmp = e.currentTarget.getAttribute('id');
+         var level = jQuery(e.currentTarget).parent().parent().find('#comment_level');
          Drupal.settings.oc_comment.selected_comment = tmp;
+         Drupal.settings.oc_comment.selected_comment_level = parseInt(level.val())+1;
          //Show the Login in a dialog.
          var tmp = jQuery(msg);
          tmp.dialog({ title: "Reply",
@@ -117,12 +119,13 @@ function bindReplyajax()
         var node_id = Drupal.settings.oc_comment.currentNid; 
         var parentid = Drupal.settings.oc_comment.selected_comment;
         var comment = document.getElementById("edit-comment-message").value;
-
+        var comment_level = "";
         //If id is -1 then we are creating a top-level comment.
         //This is safe as no comment id's are negative.
         jQuery.ajax({
             method: "GET",
-            url: "/oc/comments/ajax_form/reply/submit/" + node_id +"/"+ parentid +"/" + comment 
+            url: "/oc/comments/ajax_form/reply/submit/" + node_id +"/"+ parentid +"/" + comment +"/"
+                    + Drupal.settings.oc_comment.selected_comment_level
             //url: "/oc/comments/ajax_form/reply/submit/"
           })
             .done(function( msg ) {
