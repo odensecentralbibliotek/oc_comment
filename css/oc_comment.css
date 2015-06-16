@@ -86,3 +86,7 @@ and open the template in the editor.
     line-height: 100px;
     margin-left: 25%;
 }
+.oc-comment-form-box
+{
+    display:none;
+}

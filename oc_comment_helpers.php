@@ -121,6 +121,8 @@ function render_single_comment_entity($entity,$current_level,$is_child = false)
         $html .= oc_comment_get_buttons($tmp->parent,$current_level,$parent);
     }
      
-     $html.= "</div></div>";
+     $html.= "</div>";
+     $html .= "<div class='oc-comment-form-box'></div>";
+     $html .= "</div>";
      return $html;
 }

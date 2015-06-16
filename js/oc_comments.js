@@ -42,7 +42,7 @@ function ajax_pager()
         .done(function( msg ) {
             //retrive the new comment list and replace.
             jQuery('#oc_comments_wrap').replaceWith(msg.content).fadeIn("slow");
-            jQuery("body").scrollTop(jQuery("#oc_comments_wrap").offset().top-200);
+            jQuery("body,html").scrollTop(jQuery("#oc_comments_wrap").offset().top-200);
         });
        return false;     
     });
@@ -92,7 +92,12 @@ function bindReplyajax()
 {
       jQuery('.oc_comment_reply_btn').off('click');
       jQuery('.oc_comment_reply_btn').on('click',function(e){
-          
+         if(jQuery('#oc_comment_submit_reply_btn').is(':visible'))
+         {
+             var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
+             formbox.fadeOut("slow");
+             return false;
+         }
      jQuery.ajax({
         method: "GET",
         url: "/oc/comments/ajax_form/reply"
@@ -106,9 +111,12 @@ function bindReplyajax()
          Drupal.settings.oc_comment.selected_comment_level = parseInt(level.val())+1;
          //Show the Login in a dialog.
          var tmp = jQuery(msg);
-         tmp.dialog({ title: "Reply",
+         var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
+         formbox.html(msg);
+         formbox.fadeIn("slow");
+         /*tmp.dialog({ title: "Reply",
                       modal: true
-               });
+               });*/
         });
         return false;
     });
@@ -132,9 +140,12 @@ function bindReplyajax()
                 debugger;
                 //alert(msg);
                //did we submit with success ?
-                InsertCommentReply(msg);
-               //If success inject the new comment @ correct place.
-               jQuery('#oc-comment-comment-ajax-reply-form').dialog('close');
+               var comment = jQuery('#cid-' + Drupal.settings.oc_comment.selected_comment);
+               var formbox = comment.find('.oc-comment-form-box');
+               formbox.fadeOut("slow");
+               InsertCommentReply(msg);
+
+               //jQuery('#oc-comment-comment-ajax-reply-form').dialog('close');
             });
         
         return false;
@@ -153,7 +164,21 @@ function InsertCommentReply(comment)
         new_elem.hide();
         //new_elem.toggle();
         sibling.append(new_elem);
+        if(sibling.is(':hidden'))
+        {
+            sibling.fadeIn("slow");
+        }
         new_elem.fadeIn("slow");
+        jQuery("body,html").scrollTop(new_elem.offset().top-200);
+        new_elem.pulsate({
+            
+            reach: 20,                              // how far the pulse goes in px
+            speed: 1000,                            // how long one pulse takes in ms
+            pause: 0,                               // how long the pause between pulses is in ms
+            glow: true,                             // if the glow should be shown too
+            repeat: 1,                           // will repeat forever if true, if given a number will repeat for that many times
+            onHover: false                          // if true only pulsate if user hovers over the element
+          });
         
     }
     else
@@ -171,6 +196,12 @@ function bindDeleteajax()
      //The button hook.
      jQuery('.oc_comment_delete_btn').off();
      jQuery('.oc_comment_delete_btn').on('click',function(e){
+         if(jQuery('#oc_comment_submit_delete_confirm_btn').is(':visible'))
+         {
+             var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
+             formbox.fadeOut("slow");
+             return false;
+         }
          //clean up the dynamic dialogs.
          debugger;
         jQuery.ajax({
@@ -184,9 +215,10 @@ function bindDeleteajax()
            var tmp = e.currentTarget.getAttribute('id');
            Drupal.settings.oc_comment.selected_comment = tmp;
            var tmp = jQuery(msg);
-           tmp.dialog({ title: "delete comment",
-                     modal: true
-                 });
+           var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
+           formbox.html(msg);
+           formbox.fadeIn("slow");
+
           });
           return false;
     });
@@ -205,6 +237,9 @@ function bindDeleteajax()
           .done(function( msg ) {
              //did we submit with success ?
              jQuery('#oc-comment-comment-ajax-delete-form').dialog('close');
+               var comment = jQuery('#cid-' + Drupal.settings.oc_comment.selected_comment);
+               var formbox = comment.find('.oc-comment-form-box');
+               formbox.fadeOut("slow");
              //If success inject the new comment @ correct place.
              var comment =  jQuery('#'+Drupal.settings.oc_comment.selected_comment).parent().parent();
              comment.fadeOut(900,function(){
@@ -220,7 +255,12 @@ function bindEditajax()
     //Add so the popup opens
       jQuery('.oc_comment_edit_btn').off();
       jQuery('.oc_comment_edit_btn').on('click',function(e){
-
+         if(jQuery('#edit_comment_message').is(':visible'))
+         {
+             var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
+             formbox.fadeOut("slow");
+              return false;
+         }
          debugger;
         jQuery.ajax({
           method: "GET",
@@ -235,9 +275,9 @@ function bindEditajax()
            Drupal.settings.oc_comment.selected_comment = tmp;
            Drupal.settings.oc_comment.selected_comment_old_text = old_text;
            var tmp = jQuery(msg);
-           tmp.dialog({ title: "Edit comment",
-                     modal: true
-                 });
+           var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
+           formbox.html(msg);
+           formbox.fadeIn("slow");
             var tmp = jQuery('#edit_comment_message');
             tmp.val(old_text);
             
@@ -257,12 +297,15 @@ function bindEditajax()
             url: "/oc/comments/ajax_form/edit/submit/" + comment_edit_id + "/" +comment
           })
             .done(function( msg ) {
+                debugger
                //did we submit with success ?
                var tmp = jQuery('#cid-' + comment_edit_id);
                var tmp2 = tmp.find('.content');
-               tmp2.text(comment);
-               //If success inject the new comment @ correct place.
-               jQuery('#oc-comment-comment-ajax-edit-form').dialog('close');
+               tmp2.text(msg.comment_body.und[0].value);
+  
+               var comment = tmp;
+               var formbox = comment.find('.oc-comment-form-box');
+               formbox.fadeOut("slow");
             });
         
         return false;
