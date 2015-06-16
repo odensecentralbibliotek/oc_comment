@@ -79,3 +79,10 @@ and open the template in the editor.
 {
    cursor: pointer;
 }
+.oc_comment_large_login_btn
+{
+    color:white !important;
+    width: 100px;
+    line-height: 100px;
+    margin-left: 25%
+}

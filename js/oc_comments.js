@@ -69,8 +69,8 @@ function bind_readComments()
 }
 function bindLoginajax()
 {
-   jQuery('.oc_comment_login_btn').off();
-   jQuery('.oc_comment_login_btn').on('click',function(){
+   jQuery('.oc_comment_large_login_btn').off();
+   jQuery('.oc_comment_large_login_btn').on('click',function(){
       //alert('Login box show.');
       jQuery.ajax({
         method: "GET",

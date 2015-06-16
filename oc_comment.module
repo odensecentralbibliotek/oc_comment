@@ -7,7 +7,7 @@ require_once('oc_comment.admin.php');
 function oc_comment_menu() {
      $items['admin/oc/comments/config'] = array(
     'title' => 'Current posts',
-    'description' => 'Configuration for Current posts module',
+    'description' => 'Configuration for the oc_comment module',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('oc_comment_config_form'),
     'access arguments' => array('access administration pages'),
@@ -23,7 +23,7 @@ function oc_comment_menu() {
     
   $items['oc/comments/save/ajax/%'] = array(
     'page callback' => 'oc_comment_callback', // Render HTML
-    'description' => 'Gets Bulk place2book status for nodes',
+    'description' => '',
     'page arguments' => array(4),
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
@@ -38,14 +38,14 @@ function oc_comment_menu() {
     
   $items['oc/comments/ajax_form/reply'] = array(
     'page callback' => 'oc_comment_ajax_reply_popup', // Render HTML
-    'description' => 'opens reply box.',
+    'description' => 'Renders comment reply form for ajax.',
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
   
   $items['oc/comments/ajax_form/reply/submit/%/%/%/%'] = array(
     'page callback' => 'oc_comment_ajax_reply_submit_form', // Render HTML
-    'description' => 'handles form submit.',
+    'description' => 'handles form submit and creation of new comment.',
     'page arguments' => array(5,6,7,8),
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
@@ -53,7 +53,7 @@ function oc_comment_menu() {
   
     $items['oc/comments/ajax_form/edit'] = array(
     'page callback' => 'oc_comment_ajax_edit_popup', // Render HTML
-    'description' => 'opens edit popup.',
+    'description' => 'opens comment edit ajax popup.',
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
@@ -97,8 +97,6 @@ function oc_comment_block_info() {
  */
 function oc_comment_block_configure($delta='') {
    
-
-   
 }
 /**
  * Implements hook_block_view().
@@ -122,6 +120,10 @@ function oc_comment_block_view($delta='') {
     {
         $node = menu_get_object();
     }  
+    if($node == null)
+    {
+        return array();
+    }
     $Comments_render_arrary = array();
     if($node->comment == COMMENT_NODE_HIDDEN)
     {
@@ -138,24 +140,26 @@ function oc_comment_block_view($delta='') {
         $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
         $max_reply_level = variable_get('oc_comment_max_reply_level', 0);
         $Comments_render_arrary = oc_comments_build_comment_array($node);
+        // Initialize the pager
+        $block = array();
+        switch($delta) {
+          case 'oc_comments_block' :
+            $block['content'] = GenerateHtmlContent($Comments_render_arrary);
+            break;
+        }
+        $tmp = current_path();
+        if($ajax ==  1)
+        {
+            drupal_json_output($block);
+            drupal_exit();
+        }
+        else
+        {
+            return $block;
+        }
     }
-    // Initialize the pager
-    $block = array();
-    switch($delta) {
-      case 'oc_comments_block' :
-        $block['content'] = GenerateHtmlContent($Comments_render_arrary);
-        break;
-    }
-    $tmp = current_path();
-    if($ajax ==  1)
-    {
-        drupal_json_output($block);
-        drupal_exit();
-    }
-    else
-    {
-        return $block;
-    }
+    return array();
+    
 }
 /*
  * Genarate all the needed html to display the comment block properly.
@@ -166,13 +170,12 @@ function GenerateHtmlContent($comments)
     $current_page = pager_default_initialize(count($comments), $per_page);
     // Split your list into page sized chunks
     $chunks = array_chunk($comments, $per_page, TRUE);
-    
     $html = "<div id='oc_comments_wrap'>";
-    /*if(!user_is_logged_in())
+    if(!user_is_logged_in())
     {
-        $html .= l(t('Login To Comment'),'',array('attributes' => array('class' => 'oc_comment_login_btn',
-         'id' => $comment->cid)));
-    }*/
+        $html .= l(t('Login To Comment'),'',array('attributes' => array('class' => 'oc_comment_large_login_btn btn btn-info')));
+        return $html;
+    }
     $level = 1;
     foreach($chunks[$current_page] as $index => $comment)
     {
