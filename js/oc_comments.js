@@ -268,7 +268,6 @@ function bindEditajax()
         })
           .done(function( msg ) {
             jQuery('#oc-comment-comment-ajax-edit-form').remove();
-            debugger;
            //Show the Login in a dialog.
            var tmp = e.currentTarget.getAttribute('id');
            var old_text = jQuery( e.currentTarget).parent().parent().find('.content').text();
@@ -286,7 +285,6 @@ function bindEditajax()
     });
     //Add the submit btn handler.
       jQuery(document.body).on('click','#oc_comment_submit_edit_btn',function(e){
-        jQuery('.ui-dialog').remove();
         //Get the current comment id being replied too.
         var comment_edit_id = Drupal.settings.oc_comment.selected_comment;
         var comment = jQuery('#edit_comment_message').val();

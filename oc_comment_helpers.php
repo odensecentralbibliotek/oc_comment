@@ -77,6 +77,10 @@ function oc_comment_get_comment_body($cid)
     $entity = entity_metadata_wrapper('comment',   $comment);
     return $entity->comment_body->value();
 }
+/*
+ * Rendering of comment entities.
+ * The \n are added to make it easier to debug in browser.
+ */
 function render_single_comment_entity($entity,$current_level,$is_child = false)
 {
     $html = "";
@@ -99,10 +103,10 @@ function render_single_comment_entity($entity,$current_level,$is_child = false)
             break;
         }
     }
-    $html.= "<input type='hidden' id='comment_level' value='".$current_level."' />";
-    $html.= "<div class='submitted'>" . $full_name . " - " . date("d-m-Y H:i", $entity->parent->created). "</div>";
-    $html.= "<div class='content'>".oc_comment_get_comment_body($entity->parent->cid)."</div>";
-    $html.= "<div style='text-align: right !important' class='comment_toolbar'>";
+    $html.= "<input type='hidden' id='comment_level' value='".$current_level."' />\n";
+    $html.= "<div class='submitted'>" . $full_name . " - " . date("d-m-Y H:i", $entity->parent->created). "</div>\n";
+    $html.= "<div class='content'>".htmlentities(oc_comment_get_comment_body($entity->parent->cid))."</div>\n";
+    $html.= "<div style='text-align: right !important' class='comment_toolbar'>\n";
     //Is current level allowed to comment ? if not then dont display comment count
     if($current_level < variable_get('oc_comment_max_reply_level', 1) && sizeof($entity->children) != 0)
     {
@@ -121,8 +125,8 @@ function render_single_comment_entity($entity,$current_level,$is_child = false)
         $html .= oc_comment_get_buttons($tmp->parent,$current_level,$parent);
     }
      
-     $html.= "</div>";
-     $html .= "<div class='oc-comment-form-box'></div>";
+     $html.= "</div>\n";
+     $html .= "<div class='oc-comment-form-box'></div>\n";
      $html .= "</div>";
      return $html;
 }

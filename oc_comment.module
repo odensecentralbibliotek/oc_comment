@@ -185,9 +185,14 @@ function GenerateHtmlContent($comments)
             $html .= render_single_comment_entity($comment,0);
             $html .= recursive_render_comment_children($comment->children,$comment);
         }
+        if($index == 1)
+        {
+            break;
+        }
+       
     }
     $html .= theme('pager', array('quantity',count($comments)));
-    $html .= "</div>";
+    $html .= "</div>\n";
     
     return $html;
 }
@@ -202,7 +207,10 @@ function recursive_render_comment_children($children,$parent_comment,$current_le
         $html = "<div class='indented'>";
         foreach($children as $index => $comment)
         {
-
+            if($comment->cid = '262')
+            {
+                $break = 0;
+            }
             $html .= render_single_comment_entity($comment,$current_level,true);
             
             //Node has children. render these aswell.
@@ -210,14 +218,15 @@ function recursive_render_comment_children($children,$parent_comment,$current_le
             {
                 $html .= recursive_render_comment_children($comment->children,$comment->parent,$current_level+1);
             }
-
+            
         }
-        $html .= "</div>";
+
+        $html .= "</div>\n";
         return $html;
     }
     else
     {
-        return "";
+        return "<div>\n</div>";
     }
 }
 /*
@@ -269,7 +278,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
              */
             if(user_access('post comments') && $current_level < variable_get('oc_comment_max_reply_level', 1))
             {
-                $button_html .= l(t('reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
+                $button_html .= l(t('reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn ',
                 'id' => $comment->cid)));
             }
             /*
@@ -287,7 +296,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
     }
     else
     {
-        
+        $button_html = "";
     }
     return $button_html;
 }
@@ -319,7 +328,7 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $comment->language = LANGUAGE_NONE; // The same as for a node
         $comment->subject = 'No subject'; 
         $comment->node_type = 'comment_node_ding_news';
-        $comment->comment_body[LANGUAGE_NONE][0]['value'] = $comment_body; // Everything here is pretty much like with a node
+        $comment->comment_body[LANGUAGE_NONE][0]['value'] = htmlentities(check_plain($comment_body)); // Everything here is pretty much like with a node
         $comment->comment_body[LANGUAGE_NONE][0]['format'] = 3; 
         //$comment->field_custom_field_name[LANGUAGE_NONE][0]['value'] = ‘Some value’; // OPTIONAL. If your comment has a custom field attached it can added as simple as this // preparing a comment for a save
         
@@ -363,6 +372,13 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
             echo "0";
             drupal_exit();
         }
+    }
+    else
+    {
+        //Default to return the edit , so js is not broken.
+        //keep client side ligther.
+        drupal_json_output($entity);
+        drupal_exit();
     }
 }
 /*

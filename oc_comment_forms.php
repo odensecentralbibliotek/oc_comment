@@ -14,8 +14,12 @@ function oc_comment_comment_ajax_reply_form($form, &$form_state) {
   
   $form['submit_button'] = array(
     '#type' => 'button',
-    '#value' => t('Click Here!'),
+    '#attributes' => array(
+        'class' => array("oc_comment_btn")
+        ),
+    '#value' => t('Save'),
     '#id' => 'oc_comment_submit_reply_btn',
+    '#href' => "#",
   );
   
   return $form;
@@ -36,8 +40,12 @@ function oc_comment_comment_ajax_edit_form($form, &$form_state) {
   
   $form['submit_button'] = array(
     '#type' => 'button',
-    '#value' => t('Click Here!'),
+    '#value' => t('Save'),
     '#id' => 'oc_comment_submit_edit_btn',
+    '#attributes' => array(
+    'class' => array("oc_comment_btn"),
+    ),
+    '#href' => "#",
   );
   
   
@@ -50,16 +58,17 @@ function oc_comment_comment_ajax_delete_form($form, &$form_state)
 {
    $form['ok_button'] = array(
     '#type' => 'button',
-    '#value' => t('Slet!'),
+    '#value' => t('Delete Comment'),
     '#id' => 'oc_comment_submit_delete_confirm_btn',
   );
   
   $form['cancel_button'] = array(
     '#type' => 'button',
-    '#value' => t('annuler'),
+    '#value' => t('Cancel'),
     '#id' => 'oc_comment_submit_delete_cancel_btn',
       '#attributes' => array(
-        'onclick' => "jQuery('#oc-comment-comment-ajax-delete-form').dialog('close');return false;",
+        'onclick' => "jQuery('this').parent().fadeOut('slow');return false;",
+        'class' => array("oc_comment_btn"),
         )
   );
   return $form;

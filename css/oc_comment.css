@@ -88,5 +88,15 @@ and open the template in the editor.
 }
 .oc-comment-form-box
 {
+    margin-top: 10px;
     display:none;
+    float:left;
+    width: 100%;
+}
+.oc-comment-form-box .oc_comment_btn
+{
+    margin-top: 10px;
+}
+.oc-comment-form-box textarea{
+    resize: vertical;
 }
