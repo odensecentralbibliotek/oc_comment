@@ -19,7 +19,7 @@ function oc_comment_config_form() {
    $form['oc_comments_fieldset_logo']['oc_comment_file_path'] = array(
     '#type' => 'textfield',
     '#title' => t('image file:'),
-    '#default_value' => variable_get('oc_comment_file_path', 'https://odensebib.dk/sites/odensebib.dk/files/logo.png'),
+    '#default_value' => variable_get('oc_comment_file_path', 'https://odensebib.dk/sites/www.odensebib.dk/files/logo.png'),
     '#size' => 150,
     '#description' => t("image file name."),
   );
