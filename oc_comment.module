@@ -278,7 +278,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
              */
             if(user_access('post comments') && $current_level < variable_get('oc_comment_max_reply_level', 1))
             {
-                $button_html .= l(t('reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn ',
+                $button_html .= l(t('reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
                 'id' => $comment->cid)));
             }
             /*
