@@ -29,11 +29,11 @@ function oc_comments_build_comment_array($node)
      * Select all the top level comments.
      */
     $Comments_render_arrary = array();
-    $result = db_query('SELECT * FROM comment WHERE nid = :nid AND pid = 0 AND status != 0 ORDER BY created DESC', array(':nid' => $node->nid));
+    $result = db_query('SELECT * FROM comment WHERE nid = :nid AND pid = 0  ORDER BY created DESC', array(':nid' => $node->nid));
     foreach($result as $index => $top_comment)
     {
         //Find all children og the current top node.
-        $child_nodes = db_query('SELECT * FROM comment WHERE nid = :nid AND pid = :pid AND status != 0 ORDER BY created ASC', array(':nid' => $node->nid,':pid' => $top_comment->cid));
+        $child_nodes = db_query('SELECT * FROM comment WHERE nid = :nid AND pid = :pid  ORDER BY created ASC', array(':nid' => $node->nid,':pid' => $top_comment->cid));
         $child_nodes = $child_nodes->fetchAll();
         if(sizeof($child_nodes))
         {

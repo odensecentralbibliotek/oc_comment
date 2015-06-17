@@ -309,6 +309,12 @@ function bindEditajax()
         return false;
     });
 }
+function bindApproveajax()
+{
+    jQuery('.oc_comment_approve_btn').on('click',function(e){
+        
+    });
+}
 function getUrlParameter(url,sParam)
 {
     debugger;

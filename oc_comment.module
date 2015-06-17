@@ -80,6 +80,14 @@ function oc_comment_menu() {
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
+   
+   $items['oc/comments/ajax/approve/%'] = array(
+    'page callback' => 'oc_comment_ajax_approve_comment', // Render HTML
+    'description' => 'Approves comments',
+    'page arguments' => array(4),
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+   );
   return $items;
 }
 /**
@@ -167,6 +175,7 @@ function oc_comment_block_view($delta='') {
  */
 function GenerateHtmlContent($comments)
 {
+    global $user;
     $per_page = variable_get('oc_comment_pr_page' , 5);
     $current_page = pager_default_initialize(count($comments), $per_page);
     // Split your list into page sized chunks
@@ -180,20 +189,14 @@ function GenerateHtmlContent($comments)
     $level = 1;
     foreach($chunks[$current_page] as $index => $comment)
     {
-        if($comment->parent->status == 1)
+        if($comment->parent->status == 1 || in_array('administrator', $user->roles))
         {
             $html .= render_single_comment_entity($comment,0);
             $html .= recursive_render_comment_children($comment->children,$comment);
         }
-        if($index == 1)
-        {
-            break;
-        }
-       
     }
     $html .= theme('pager', array('quantity',count($comments)));
     $html .= "</div>\n";
-    
     return $html;
 }
 /*
@@ -207,10 +210,6 @@ function recursive_render_comment_children($children,$parent_comment,$current_le
         $html = "<div class='indented'>";
         foreach($children as $index => $comment)
         {
-            if($comment->cid = '262')
-            {
-                $break = 0;
-            }
             $html .= render_single_comment_entity($comment,$current_level,true);
             
             //Node has children. render these aswell.
@@ -218,9 +217,7 @@ function recursive_render_comment_children($children,$parent_comment,$current_le
             {
                 $html .= recursive_render_comment_children($comment->children,$comment->parent,$current_level+1);
             }
-            
         }
-
         $html .= "</div>\n";
         return $html;
     }
@@ -239,6 +236,12 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
     $button_html = "";
     if(user_is_logged_in())
     {
+        //Is comment waiting approval ? add button.
+        if($comment->status == 0 && in_array('administrator', $user->roles))
+        {
+            $button_html .= l(t('Approve'),'',array('attributes' => array('class' => 'oc_comment_approve_btn oc_comment_btn',
+                'id' => $comment->cid)));
+        }
         //is own comment ?
         if($user->uid == $comment->uid)
         {
@@ -247,8 +250,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
              * always check if the current level allows reply's !
              *
              */
-            $tmp = variable_get('oc_comment_max_reply_level', 1);
-            if(user_access('post comments')  && $current_level < $tmp)
+            if(user_access('post comments')  && $current_level < variable_get('oc_comment_max_reply_level', 1))
             {
                 $button_html .= l(t('reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
                 'id' => $comment->cid)));
@@ -337,7 +339,6 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $entity->save();
         //get the saved comments id.
         $comment->cid = $entity->getIdentifier();
-        
         /*
          * Hack so we can use 1 function to render...
          */
@@ -402,11 +403,19 @@ function oc_comment_ajax_delete_submit_form($cid)
     }
     drupal_exit();
 }
+function oc_comment_ajax_approve_comment($cid)
+{
+    //is user logged in and has correct roles ?
+        //approve comment :)
+}
 function oc_comment_form_comment_form_alter(&$form,$form_state)
 {
-    $test = "";
-    hide($form['author']);
-    //$form['comment_body']['und'][0]['value']['#title'] = null;
-   
+    hide($form['author']);   
     $form['comment_body']['und'][0]['value']['#title_display'] = 'invisible';
+}
+function oc_comment_form_ding_user_comment_forbidden_form_alter(&$form,$form_state)
+{
+    hide($form['submit']);
+    
+    //$test = "";
 }

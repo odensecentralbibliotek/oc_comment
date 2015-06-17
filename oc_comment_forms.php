@@ -8,7 +8,8 @@ function oc_comment_comment_ajax_reply_form($form, &$form_state) {
     '#size' => 50,
     '#required' => TRUE, //make this field required
     '#name' => 'comment_message',
-    '#id' => 'reply_comment_message'
+    '#id' => 'reply_comment_message',
+    '#placeholder' => t('Write your comment reply here..')
   );
   $form['#action'] = "/oc/comments/ajax_form/reply/submit"; //the submit will be hijacked by javascript.
   
@@ -21,7 +22,15 @@ function oc_comment_comment_ajax_reply_form($form, &$form_state) {
     '#id' => 'oc_comment_submit_reply_btn',
     '#href' => "#",
   );
-  
+  $form['cancel_button'] = array(
+    '#type' => 'button',
+    '#value' => t('Cancel'),
+    '#id' => 'oc_comment_submit_delete_cancel_btn',
+      '#attributes' => array(
+        'onclick' => "jQuery(this).parent().parent().parent().fadeOut('slow').hide();return false;",
+        'class' => array("oc_comment_btn"),
+        )
+  );
   return $form;
 }
 /*
@@ -47,7 +56,15 @@ function oc_comment_comment_ajax_edit_form($form, &$form_state) {
     ),
     '#href' => "#",
   );
-  
+  $form['cancel_button'] = array(
+    '#type' => 'button',
+    '#value' => t('Cancel'),
+    '#id' => 'oc_comment_submit_delete_cancel_btn',
+      '#attributes' => array(
+        'onclick' => "jQuery(this).parent().parent().parent().fadeOut('slow').toggle();return false;",
+        'class' => array("oc_comment_btn"),
+        )
+  );
   
   return $form;
 }
@@ -67,7 +84,7 @@ function oc_comment_comment_ajax_delete_form($form, &$form_state)
     '#value' => t('Cancel'),
     '#id' => 'oc_comment_submit_delete_cancel_btn',
       '#attributes' => array(
-        'onclick' => "jQuery('this').parent().fadeOut('slow');return false;",
+        'onclick' => "jQuery(this).parent().fadeOut('slow').toggle();return false;",
         'class' => array("oc_comment_btn"),
         )
   );
