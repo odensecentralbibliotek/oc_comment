@@ -29,11 +29,13 @@ function oc_comments_build_comment_array($node)
      * Select all the top level comments.
      */
     $Comments_render_arrary = array();
-    $result = db_query('SELECT * FROM comment WHERE nid = :nid AND pid = 0  ORDER BY created DESC', array(':nid' => $node->nid));
+    $Top_level_sort = variable_get('oc_comment_top_level_sort','DESC');
+    $result = db_query("SELECT * FROM comment WHERE nid = :nid AND pid = 0  ORDER BY created {$Top_level_sort} ", array(':nid' => $node->nid));
     foreach($result as $index => $top_comment)
     {
         //Find all children og the current top node.
-        $child_nodes = db_query('SELECT * FROM comment WHERE nid = :nid AND pid = :pid  ORDER BY created ASC', array(':nid' => $node->nid,':pid' => $top_comment->cid));
+        $Child_level_sort = variable_get('oc_comment_child_level_sort','ASC');
+        $child_nodes = db_query("SELECT * FROM comment WHERE nid = :nid AND pid = :pid  ORDER BY created {$Child_level_sort}", array(':nid' => $node->nid,':pid' => $top_comment->cid));
         $child_nodes = $child_nodes->fetchAll();
         if(sizeof($child_nodes))
         {
@@ -91,19 +93,23 @@ function render_single_comment_entity($entity,$current_level,$is_child = false)
      * makes it all look more official :)
      */
     $site_admin_roles = array('administrator','redaktør');
+    $wrap_classes = array();
+    $wrap_classes[] = "comment";
+    $wrap_classes[] = $entity->parent->status == 0 ? 'oc-comment-approval-required' : 'oc-comment-approved';
+    $wrap_classes[] = ($is_child == true ? 'oc_comment_child' : 'oc_comment_parent');
     
-    $html.= "<div id='cid-".$entity->parent->cid."' class='comment "
-    . ($is_child == true ? 'oc_comment_child' : 'oc_comment_parent') ."'>";
+    $html.= "<div id='cid-".$entity->parent->cid."' class='" .implode(' ', $wrap_classes) ."'>";
     foreach($comment_user->roles as $roles)
     {
         if(in_array($roles, $site_admin_roles))
         {
             $logo_img = variable_get('oc_comment_file_path','https://odensebib.dk/sites/www.odensebib.dk/files/logo.png');
-            $html.= "<img title='Biblioteks ansat' id='comment_logo' src='{$logo_img}' />";
+            $html .= "<img title='Biblioteks ansat' id='comment_logo' src='{$logo_img}' />";
             break;
         }
     }
     $html.= "<input type='hidden' id='comment_level' value='".$current_level."' />\n";
+    $html.= "<input type='hidden' id='comment_id' value='".$entity->parent->cid."' />\n";
     $html.= "<div class='submitted'>" . $full_name . " - " . date("d-m-Y H:i", $entity->parent->created). "</div>\n";
     $html.= "<div class='content'>".htmlentities(oc_comment_get_comment_body($entity->parent->cid))."</div>\n";
     $html.= "<div style='text-align: right !important' class='comment_toolbar'>\n";
@@ -129,4 +135,11 @@ function render_single_comment_entity($entity,$current_level,$is_child = false)
      $html .= "<div class='oc-comment-form-box'></div>\n";
      $html .= "</div>";
      return $html;
+}
+function oc_comments_user_check_validation($msg = null,$required_role = null)
+{
+    if(!user_is_logged_in())
+    {
+        drupal_exit();
+    }
 }

@@ -31,6 +31,7 @@ function oc_comment_comment_ajax_reply_form($form, &$form_state) {
         'class' => array("oc_comment_btn"),
         )
   );
+  
   return $form;
 }
 /*

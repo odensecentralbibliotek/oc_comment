@@ -13,6 +13,7 @@ function Init_buttons()
     bindReplyajax();
     bindEditajax();
     bindDeleteajax();
+    bindApproveajax();
     bind_readComments();
 }
 function toggle_spinner(selector,width,height,margin_left,margin_right)
@@ -77,7 +78,6 @@ function bindLoginajax()
         url: "/oc/comments/ajax_form/login"
       })
         .done(function( msg ) {
-            debugger;
          //Show the Login in a dialog.
          var tmp = jQuery(msg);
          tmp.dialog({ title: "Login",
@@ -103,7 +103,6 @@ function bindReplyajax()
         url: "/oc/comments/ajax_form/reply"
       })
         .done(function( msg ) {
-          debugger;
          jQuery('#oc-comment-comment-ajax-reply-form').remove();
          var tmp = e.currentTarget.getAttribute('id');
          var level = jQuery(e.currentTarget).parent().parent().find('#comment_level');
@@ -134,18 +133,13 @@ function bindReplyajax()
             method: "GET",
             url: "/oc/comments/ajax_form/reply/submit/" + node_id +"/"+ parentid +"/" + comment +"/"
                     + Drupal.settings.oc_comment.selected_comment_level
-            //url: "/oc/comments/ajax_form/reply/submit/"
           })
             .done(function( msg ) {
-                debugger;
-                //alert(msg);
                //did we submit with success ?
                var comment = jQuery('#cid-' + Drupal.settings.oc_comment.selected_comment);
                var formbox = comment.find('.oc-comment-form-box');
                formbox.fadeOut("slow");
                InsertCommentReply(msg);
-
-               //jQuery('#oc-comment-comment-ajax-reply-form').dialog('close');
             });
         
         return false;
@@ -179,7 +173,6 @@ function InsertCommentReply(comment)
             repeat: 1,                           // will repeat forever if true, if given a number will repeat for that many times
             onHover: false                          // if true only pulsate if user hovers over the element
           });
-        
     }
     else
     {
@@ -295,7 +288,6 @@ function bindEditajax()
             url: "/oc/comments/ajax_form/edit/submit/" + comment_edit_id + "/" +comment
           })
             .done(function( msg ) {
-                debugger
                //did we submit with success ?
                var tmp = jQuery('#cid-' + comment_edit_id);
                var tmp2 = tmp.find('.content');
@@ -312,12 +304,23 @@ function bindEditajax()
 function bindApproveajax()
 {
     jQuery('.oc_comment_approve_btn').on('click',function(e){
-        
+        debugger;
+        var cid = jQuery( e.currentTarget).parent().parent().find('#comment_id').val();
+        //are you sure ?
+        jQuery.ajax({
+            method: "GET",
+            url: "/oc/comments/ajax/approve/" + cid
+          }).done(function( msg ) {
+              debugger;
+               //hide button and somehow show success
+               jQuery('#cid-' + cid).find('.oc_comment_approve_btn').hide();
+          });
+            //start approving.
+        return false;
     });
 }
 function getUrlParameter(url,sParam)
 {
-    debugger;
     var sPageURL = url.split('?')[1];
     if(sPageURL === undefined)
     {

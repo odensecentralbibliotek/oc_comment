@@ -12,11 +12,12 @@ function oc_comment_menu() {
     'page arguments' => array('oc_comment_config_form'),
     'access arguments' => array('access administration pages'),
     'type' => MENU_NORMAL_ITEM,
+         
   );
     
     $items['oc/comments/ajax/get'] = array(
     'page callback' => 'oc_comment_block_view', // Render HTML
-    'description' => 'Gets Bulk place2book status for nodes',
+    'description' => 'ajax load of comments',
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
@@ -250,7 +251,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
              * always check if the current level allows reply's !
              *
              */
-            if(user_access('post comments')  && $current_level < variable_get('oc_comment_max_reply_level', 1))
+            if(user_access('post comments')  && $current_level < variable_get('oc_comment_max_reply_level', 1) && $comment->status != 0)
             {
                 $button_html .= l(t('reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
                 'id' => $comment->cid)));
@@ -278,7 +279,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
              * User can post new/reply to comments.
              * always check if the current level allows reply's !
              */
-            if(user_access('post comments') && $current_level < variable_get('oc_comment_max_reply_level', 1))
+            if(user_access('post comments') && $current_level < variable_get('oc_comment_max_reply_level', 1) && $comment->status != 0)
             {
                 $button_html .= l(t('reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
                 'id' => $comment->cid)));
@@ -312,7 +313,7 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
     //echo "comment: " . $comment_body;
     global $language;
     global $user;
-    if(strlen($comment_body) > 0)
+    if(strlen($comment_body) > 0 && user_is_logged_in())
     {
         $comment = new stdClass();
         $comment->nid = $nodeid; // nid of a node you want to attach a comment to
@@ -357,11 +358,12 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
  */
 function oc_comment_ajax_edit_submit_form($cid,$comment_body)
 {
+    oc_comments_user_check_validation(); // make sure user is logged in.
     $entity = reset(entity_load('comment',array($cid)));
     
     if($entity->comment_body[LANGUAGE_NONE][0]['value'] != $comment_body)
     {
-        $entity->comment_body[LANGUAGE_NONE][0]['value'] =  $comment_body;
+        $entity->comment_body[LANGUAGE_NONE][0]['value'] =  htmlentities(check_plain($comment_body));
         $entity_wrap = entity_metadata_wrapper('comment',  $entity);
         if($entity_wrap->save())
         {
@@ -382,11 +384,13 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
         drupal_exit();
     }
 }
+
 /*
  * Delete Comment and if needed all its children.
  */
 function oc_comment_ajax_delete_submit_form($cid)
 {
+     oc_comments_user_check_validation(); // make sure user is logged in.
     /*
      * It always returns null. as the comment entity does not seem
      * to be compatible with the CRUD api. 
@@ -405,8 +409,17 @@ function oc_comment_ajax_delete_submit_form($cid)
 }
 function oc_comment_ajax_approve_comment($cid)
 {
+     oc_comments_user_check_validation(); // make sure user is logged in.
     //is user logged in and has correct roles ?
         //approve comment :)
+     if(!$success)
+    {
+        echo "1";
+    }
+    else
+    {
+        echo "0";
+    }
 }
 function oc_comment_form_comment_form_alter(&$form,$form_state)
 {
