@@ -402,3 +402,11 @@ function oc_comment_ajax_delete_submit_form($cid)
     }
     drupal_exit();
 }
+function oc_comment_form_comment_form_alter(&$form,$form_state)
+{
+    $test = "";
+    hide($form['author']);
+    //$form['comment_body']['und'][0]['value']['#title'] = null;
+   
+    $form['comment_body']['und'][0]['value']['#title_display'] = 'invisible';
+}

@@ -58,13 +58,14 @@ and open the template in the editor.
     display: none;
 }
 .comment-form .form-submit {
-  float: right;
+
   background: #C7EAED;
   border-radius: 8px;
   border: 1px solid lightgray;
-  margin-top: -29px;
   padding: 2px 10px 2px 10px;
-  margin-right: 10px;
+  margin-top: 10px;
+  float:right;
+  cursor: pointer;
 }
 .comment-legend {
   float: right;
@@ -99,4 +100,8 @@ and open the template in the editor.
 }
 .oc-comment-form-box textarea{
     resize: vertical;
+}
+label.#edit-comment-body-und-0-value
+{
+    display:none;
 }
