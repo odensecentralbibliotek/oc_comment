@@ -111,7 +111,7 @@ function render_single_comment_entity($entity,$current_level,$is_child = false)
     $html.= "<input type='hidden' id='comment_level' value='".$current_level."' />\n";
     $html.= "<input type='hidden' id='comment_id' value='".$entity->parent->cid."' />\n";
     $html.= "<div class='submitted'><b>" . $full_name . " - " . date("d-m-Y H:i", $entity->parent->created). "</b></div>\n";
-    $html.= "<div class='content'>".htmlentities(check_plain(oc_comment_get_comment_body($entity->parent->cid)))."</div>\n";
+    $html.= "<div class='content'>".check_plain(oc_comment_get_comment_body($entity->parent->cid))."</div>\n";
     $html.= "<div style='text-align: right !important' class='comment_toolbar'>\n";
     //Is current level allowed to comment ? if not then dont display comment count
     if($current_level < variable_get('oc_comment_max_reply_level', 1) && sizeof($entity->children) != 0)
