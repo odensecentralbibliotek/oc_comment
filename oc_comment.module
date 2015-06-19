@@ -424,9 +424,12 @@ function oc_comment_ajax_approve_comment($cid)
         echo "0";
     }
 }
+/*
 function oc_comment_theme() {
     
 }
+ * 
+ */
 function oc_comment_form_comment_form_alter(&$form,$form_state)
 {
     hide($form['author']);   
