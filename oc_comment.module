@@ -363,7 +363,7 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
     
     if($entity->comment_body[LANGUAGE_NONE][0]['value'] != $comment_body)
     {
-        $entity->comment_body[LANGUAGE_NONE][0]['value'] =  htmlentities(check_plain($comment_body));
+        $entity->comment_body[LANGUAGE_NONE][0]['value'] =  check_plain($comment_body);
         $entity_wrap = entity_metadata_wrapper('comment',  $entity);
         if($entity_wrap->save())
         {
