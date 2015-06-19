@@ -42,7 +42,6 @@
   };
 
   var pulse = function(options, el, count) {
-      debugger;
       if(options.color.indexOf(",") == -1)
       {
           options.color = "rgba(0,0,0,0)"

@@ -18,7 +18,7 @@ function oc_comment_comment_ajax_reply_form($form, &$form_state) {
     '#attributes' => array(
         'class' => array("oc_comment_btn")
         ),
-    '#value' => t('Save'),
+    '#value' => t('Send'),
     '#id' => 'oc_comment_submit_reply_btn',
     '#href' => "#",
   );
@@ -50,7 +50,7 @@ function oc_comment_comment_ajax_edit_form($form, &$form_state) {
   
   $form['submit_button'] = array(
     '#type' => 'button',
-    '#value' => t('Save'),
+    '#value' => t('Send'),
     '#id' => 'oc_comment_submit_edit_btn',
     '#attributes' => array(
     'class' => array("oc_comment_btn"),

@@ -253,7 +253,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
              */
             if(user_access('post comments')  && $current_level < variable_get('oc_comment_max_reply_level', 1) && $comment->status != 0)
             {
-                $button_html .= l(t('reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
+                $button_html .= l(t('Reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
                 'id' => $comment->cid)));
             }
             /*
@@ -281,7 +281,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
              */
             if(user_access('post comments') && $current_level < variable_get('oc_comment_max_reply_level', 1) && $comment->status != 0)
             {
-                $button_html .= l(t('reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
+                $button_html .= l(t('Reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
                 'id' => $comment->cid)));
             }
             /*
@@ -329,9 +329,9 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $comment->homepage = ''; // you can add homepage URL here
         $comment->status = user_access('skip comment approval') ? COMMENT_PUBLISHED : COMMENT_NOT_PUBLISHED; // We auto-publish this comment
         $comment->language = LANGUAGE_NONE; // The same as for a node
-        $comment->subject = 'No subject'; 
+        $comment->subject = t('Comment Reply'); 
         $comment->node_type = 'comment_node_ding_news';
-        $comment->comment_body[LANGUAGE_NONE][0]['value'] = htmlentities(check_plain($comment_body)); // Everything here is pretty much like with a node
+        $comment->comment_body[LANGUAGE_NONE][0]['value'] = check_plain($comment_body); // Everything here is pretty much like with a node
         $comment->comment_body[LANGUAGE_NONE][0]['format'] = 3; 
         //$comment->field_custom_field_name[LANGUAGE_NONE][0]['value'] = ‘Some value’; // OPTIONAL. If your comment has a custom field attached it can added as simple as this // preparing a comment for a save
         
@@ -410,9 +410,12 @@ function oc_comment_ajax_delete_submit_form($cid)
 function oc_comment_ajax_approve_comment($cid)
 {
      oc_comments_user_check_validation(); // make sure user is logged in.
+      $entity = reset(entity_load('comment',array($cid)));
+      $entity_wrap = entity_metadata_wrapper('comment',  $entity);
+      $entity_wrap->status = 1;
     //is user logged in and has correct roles ?
         //approve comment :)
-     if(!$success)
+    if($entity_wrap->save())
     {
         echo "1";
     }
@@ -420,6 +423,9 @@ function oc_comment_ajax_approve_comment($cid)
     {
         echo "0";
     }
+}
+function oc_comment_theme() {
+    
 }
 function oc_comment_form_comment_form_alter(&$form,$form_state)
 {
@@ -429,6 +435,10 @@ function oc_comment_form_comment_form_alter(&$form,$form_state)
 function oc_comment_form_ding_user_comment_forbidden_form_alter(&$form,$form_state)
 {
     hide($form['submit']);
-    
-    //$test = "";
+}
+function oc_comment_comment_node_presave($node)
+{
+    //for some reason when we save with normal submit.
+    //If title is "empty" it gets set to be the content of the node....
+    $node = $node;
 }

@@ -151,6 +151,7 @@ function InsertCommentReply(comment)
     var cid = comment.cid;
     var elem = jQuery('#cid-' +pid);
     var sibling = elem.next();
+    debugger;
     //check if there are existing comments.
     if(sibling.hasClass('indented'))
     {
