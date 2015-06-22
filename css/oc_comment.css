@@ -5,17 +5,20 @@ and open the template in the editor.
 */
 /* 
     Created on : 19-05-2015, 09:07:56
-    Author     : amer
+    Author     : tfpet
 */
-/** Comments **/
+#oc_comments_wrap
+{
+    min-width: 100%;
+}
 .comment {
-  border: 1px dashed #69c8cf;
-  border-radius: 10px;
-  border-top-left-radius: 0px;
-  margin: 10px;
-  padding: 5px;
-  float:left;
-  width: 97%;
+    border: 1px dashed #69c8cf;
+    border-radius: 10px;
+    border-top-left-radius: 0px;
+    margin: 10px;
+    padding: 5px;
+    float:left;
+    width: 97%;
 }
 #comment_logo
 {
@@ -31,7 +34,8 @@ and open the template in the editor.
     background: aliceblue;
 }
 
-.comment .links a {
+.comment .links a 
+{
     background: #C7EAED;
     padding: 4px;
     color: black;
@@ -50,27 +54,31 @@ and open the template in the editor.
     float: right;
     margin-left: 3px;
 }
-.comment-form .form-textarea {
-  resize:none;
+.comment-form .form-textarea 
+{
+    resize:none;
 }
 
-.comment h3 {
+.comment h3 
+{
     display: none;
 }
-.comment-form .form-submit {
+.comment-form .form-submit 
+{
 
-  background: #C7EAED;
-  border-radius: 8px;
-  border: 1px solid lightgray;
-  padding: 2px 10px 2px 10px;
-  margin-top: 10px;
-  float:right;
-  cursor: pointer;
+    background: #C7EAED;
+    border-radius: 8px;
+    border: 1px solid lightgray;
+    padding: 2px 10px 2px 10px;
+    margin-top: 10px;
+    float:right;
+    cursor: pointer;
 }
-.comment-legend {
-  float: right;
-  color: #69c8cf;
-  font-weight: 700;
+.comment-legend 
+{
+    float: right;
+    color: #69c8cf;
+    font-weight: 700;
 }
 .indented
 {
@@ -78,14 +86,19 @@ and open the template in the editor.
 }
 .oc_comment_btn
 {
-   cursor: pointer;
+    cursor: pointer;
+}
+#oc-comment-login-btn-wrap
+{
+    text-align:center;
+    min-width: 90%;
 }
 .oc_comment_large_login_btn
 {
     color:white !important;
     width: 100px;
     line-height: 100px;
-    margin-left: 25%;
+
 }
 .oc-comment-form-box
 {
@@ -98,7 +111,8 @@ and open the template in the editor.
 {
     margin-top: 10px;
 }
-.oc-comment-form-box textarea{
+.oc-comment-form-box textarea
+{
     resize: vertical;
 }
 .ding-user-comment-forbidden-form

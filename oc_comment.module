@@ -1,4 +1,5 @@
 <?php
+
 require_once('oc_comment_forms.php');
 require_once('oc_comment_popups.php');
 require_once('oc_comment_helpers.php');
@@ -150,6 +151,7 @@ function oc_comment_block_view($delta='') {
         $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
         $max_reply_level = variable_get('oc_comment_max_reply_level', 0);
         $Comments_render_arrary = oc_comments_build_comment_array($node);
+        
         // Initialize the pager
         $block = array();
         switch($delta) {
@@ -177,20 +179,24 @@ function oc_comment_block_view($delta='') {
 function GenerateHtmlContent($comments)
 {
     global $user;
+    $level = 1;    
     $per_page = variable_get('oc_comment_pr_page' , 5);
     $current_page = pager_default_initialize(count($comments), $per_page);
     // Split your list into page sized chunks
     $chunks = array_chunk($comments, $per_page, TRUE);
     $html = "<div id='oc_comments_wrap'>";
+    /*
+     * If user is not logged in , show the login button on top of the comments.
+     */
     if(!user_is_logged_in())
     {
+        $html .= "<div id='oc-comment-login-btn-wrap'>";
         $html .= l(t('Login To Comment'),'',array('attributes' => array('class' => 'oc_comment_large_login_btn btn btn-info')));
-        return $html;
+        $html .= "</div>";
     }
-    $level = 1;
     foreach($chunks[$current_page] as $index => $comment)
     {
-        if($comment->parent->status == 1 || in_array('administrator', $user->roles))
+        if($comment->parent->status == 1 || in_array('administrator', $user->roles) || $comment->parent->uid == $user->uid)
         {
             $html .= render_single_comment_entity($comment,0);
             $html .= recursive_render_comment_children($comment->children,$comment);
@@ -201,7 +207,7 @@ function GenerateHtmlContent($comments)
     return $html;
 }
 /*
- * Recursively generate html for all child codes in the array.
+ * Recursively generate html for all child nodes in the array.
  * children always start at level 1
  */
 function recursive_render_comment_children($children,$parent_comment,$current_level = 1)
@@ -308,9 +314,6 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
  */
 function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$current_level)
 {
-    //echo "Nodeid: " . $nodeid;
-    //echo "parent: " . $parentid;
-    //echo "comment: " . $comment_body;
     global $language;
     global $user;
     if(strlen($comment_body) > 0 && user_is_logged_in())
@@ -332,9 +335,7 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $comment->subject = t('Comment Reply'); 
         $comment->node_type = 'comment_node_ding_news';
         $comment->comment_body[LANGUAGE_NONE][0]['value'] = check_plain($comment_body); // Everything here is pretty much like with a node
-        $comment->comment_body[LANGUAGE_NONE][0]['format'] = 3; 
-        //$comment->field_custom_field_name[LANGUAGE_NONE][0]['value'] = ‘Some value’; // OPTIONAL. If your comment has a custom field attached it can added as simple as this // preparing a comment for a save
-        
+        $comment->comment_body[LANGUAGE_NONE][0]['format'] = 3;        
         $entity = entity_create('comment', (array)$comment);
         $entity = entity_metadata_wrapper('comment',  $entity);
         $entity->save();
