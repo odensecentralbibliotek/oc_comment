@@ -1,7 +1,6 @@
 <?php
 
 require_once('oc_comment_forms.php');
-require_once('oc_comment_popups.php');
 require_once('oc_comment_helpers.php');
 require_once('oc_comment.admin.php');
 
@@ -32,14 +31,14 @@ function oc_comment_menu() {
    );
   
     $items['oc/comments/ajax_form/login'] = array(
-    'page callback' => 'oc_comment_ajax_login_popup', // Render HTML
+    'page callback' => 'oc_comment_ajax_login_form', // Render HTML
     'description' => 'Opens Login box.',
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
     
   $items['oc/comments/ajax_form/reply'] = array(
-    'page callback' => 'oc_comment_ajax_reply_popup', // Render HTML
+    'page callback' => 'oc_comment_ajax_reply_form', // Render HTML
     'description' => 'Renders comment reply form for ajax.',
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
@@ -48,13 +47,13 @@ function oc_comment_menu() {
   $items['oc/comments/ajax_form/reply/submit/%/%/%/%'] = array(
     'page callback' => 'oc_comment_ajax_reply_submit_form', // Render HTML
     'description' => 'handles form submit and creation of new comment.',
-    'page arguments' => array(5,6,7,8),
+    'page arguments' => array(5,6,7,8,9),
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
   
     $items['oc/comments/ajax_form/edit'] = array(
-    'page callback' => 'oc_comment_ajax_edit_popup', // Render HTML
+    'page callback' => 'oc_comment_ajax_edit_form', // Render HTML
     'description' => 'opens comment edit ajax popup.',
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
@@ -77,7 +76,7 @@ function oc_comment_menu() {
    );
     
    $items['oc/comments/ajax_form/delete'] = array(
-    'page callback' => 'oc_comment_ajax_delete_popup', // Render HTML
+    'page callback' => 'oc_comment_ajax_delete_form', // Render HTML
     'description' => 'deletes comment popup confirm',
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
@@ -99,6 +98,9 @@ function oc_comment_block_info() {
   $blocks = array();
   $blocks['oc_comments_block'] = array(
     'info' => t('oc comments block'),
+  );
+  $blocks['oc_comments_form_submit_block'] = array(
+    'info' => t('oc comments form'),
   );
   return $blocks;
 }
@@ -141,7 +143,9 @@ function oc_comment_block_view($delta='') {
     }
     if($node->comment == COMMENT_NODE_OPEN)
     {
-        $setting = array('oc_comment' => array('currentNid' => $node->nid));
+        global $user;
+        $skip_approval = user_access('skip comment approval',$user) ? 1 : 0;
+        $setting = array('oc_comment' => array('currentNid' => $node->nid,'skip_approval' => $skip_approval));
         drupal_add_js($setting, 'setting');
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/oc_comments.js');
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/jquery.pulsate.js');
@@ -150,14 +154,30 @@ function oc_comment_block_view($delta='') {
         //Get the comments of the current node.
         $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
         $max_reply_level = variable_get('oc_comment_max_reply_level', 0);
-        $Comments_render_arrary = oc_comments_build_comment_array($node);
+  
         
         // Initialize the pager
         $block = array();
         switch($delta) {
           case 'oc_comments_block' :
+          {
+            $Comments_render_arrary = oc_comments_build_comment_array($node);
             $block['content'] = GenerateHtmlContent($Comments_render_arrary);
             break;
+          }
+          case 'oc_comments_form_submit_block' :
+          {
+               if(user_is_logged_in())
+               {
+                   $block['content'] = drupal_get_form('oc_comment_comment_submit_form',$node->nid);
+               }
+               else
+               {
+                   $block['content'] = '';
+               }
+              
+              break;
+          }
         }
         $tmp = current_path();
         if($ajax ==  1)
@@ -184,7 +204,7 @@ function GenerateHtmlContent($comments)
     $current_page = pager_default_initialize(count($comments), $per_page);
     // Split your list into page sized chunks
     $chunks = array_chunk($comments, $per_page, TRUE);
-    $html = "<div id='oc_comments_wrap'>";
+    $html = "<div id='oc-comments-wrap'>";
     /*
      * If user is not logged in , show the login button on top of the comments.
      */
@@ -312,7 +332,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
 /*
  * Handles creating new comments.
  */
-function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$current_level)
+function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$current_level,$subject)
 {
     global $language;
     global $user;
@@ -323,7 +343,7 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $comment->cid = 0; // leave it as is
         $comment->pid = $parentid != -1 ? $parentid : 0; // parent comment id, 0 if none 
         $comment->uid = $user->uid; // user's id, who left the comment
-        $comment->mail = 'email@example.com'; // user's email
+        $comment->mail = $user->mail; // user's email
         $comment->name = $user->name; // If user is authenticated you can omit this field, it will be auto-populated, if the user is anonymous and you want to name him somehow, input his name here
         //$comment->thread = '01/'; // OPTIONAL. If you need comments to be threaded you can fill this value. Otherwise omit it.
         //$comment->hostname = '127.0.01' // OPTIONAL. You can log poster's ip here
@@ -332,7 +352,7 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $comment->homepage = ''; // you can add homepage URL here
         $comment->status = user_access('skip comment approval') ? COMMENT_PUBLISHED : COMMENT_NOT_PUBLISHED; // We auto-publish this comment
         $comment->language = LANGUAGE_NONE; // The same as for a node
-        $comment->subject = t('Comment Reply'); 
+        $comment->subject = $subject == 'undefined' ? t('No subject') : $subject; 
         $comment->node_type = 'comment_node_ding_news';
         $comment->comment_body[LANGUAGE_NONE][0]['value'] = check_plain($comment_body); // Everything here is pretty much like with a node
         $comment->comment_body[LANGUAGE_NONE][0]['format'] = 3;        
@@ -385,7 +405,6 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
         drupal_exit();
     }
 }
-
 /*
  * Delete Comment and if needed all its children.
  */
@@ -425,12 +444,14 @@ function oc_comment_ajax_approve_comment($cid)
         echo "0";
     }
 }
-/*
-function oc_comment_theme() {
-    
+function oc_comment_theme($existing, $type, $theme, $path) {
+    return array(
+    'oc_comment_item' => array(
+      'path' => $path . '/templates',
+      'template' => 'oc-comment-item',
+       'arguments' => array('oc_comments' => null), //define $xxx so it will available in your xxx-xxx.tpl.php
+    ));
 }
- * 
- */
 function oc_comment_form_comment_form_alter(&$form,$form_state)
 {
     hide($form['author']);   
@@ -439,10 +460,4 @@ function oc_comment_form_comment_form_alter(&$form,$form_state)
 function oc_comment_form_ding_user_comment_forbidden_form_alter(&$form,$form_state)
 {
     hide($form['submit']);
-}
-function oc_comment_comment_node_presave($node)
-{
-    //for some reason when we save with normal submit.
-    //If title is "empty" it gets set to be the content of the node....
-    $node = $node;
 }

@@ -8,8 +8,9 @@ jQuery('document').ready(function () {
 });
 function Init_buttons()
 {
-    jQuery('body').off('click');
+    //jQuery('body').off('click');
     bindLoginajax();
+    bind_form_submit();
     bindReplyajax();
     bindEditajax();
     bindDeleteajax();
@@ -28,6 +29,44 @@ function toggle_spinner(selector, width, height, margin_left, margin_right)
     });
     jQuery(selector).html(spinner);
 }
+function bind_form_submit()
+{
+    jQuery(document.body).on('click','#oc_comment_submit_form_btn', function (e) {
+        debugger;
+        var node_id = Drupal.settings.oc_comment.currentNid;
+        var parentid = -1;
+        var comment = document.getElementById("reply_comment_submit_message").value;
+        var comment_level = 0;
+        var comment_subject = jQuery('#reply_comment_submit_subject').val();
+        //If id is -1 then we are creating a top-level comment.
+        //This is safe as no comment id's are negative.
+        jQuery.ajax({
+            method: "GET",
+            url: "/oc/comments/ajax_form/reply/submit/" + node_id + "/" + parentid + "/" + comment + "/"
+                    + Drupal.settings.oc_comment.selected_comment_level +"/"+comment_subject
+        })
+                .done(function (msg) {
+                    //insert the created comment.
+                    jQuery('#oc-comments-wrap').prepend(msg.markup);
+                    if(Drupal.settings.oc_comment.skip_approval)
+                    {
+                        jQuery(".submit-form-error-message").append('<div class="messages status">Comment Postet</div>');
+                     
+     
+                    }
+                    else
+                    {
+                        jQuery(".submit-form-error-message").append('<div class="messages status">Comment awaiting admin approval</div>');
+                    }
+                    jQuery('#reply_comment_submit_subject').val(null);
+                    jQuery('#reply_comment_submit_message').val(null);
+                });
+
+        return false;
+    
+    
+    });
+}
 function ajax_pager()
 {
     jQuery(document.body).on('click', '.pager li a', function (e) {
@@ -42,8 +81,8 @@ function ajax_pager()
         })
                 .done(function (msg) {
                     //retrive the new comment list and replace.
-                    jQuery('#oc_comments_wrap').replaceWith(msg.content).fadeIn("slow");
-                    jQuery("body,html").scrollTop(jQuery("#oc_comments_wrap").offset().top - 200);
+                    jQuery('#oc-comments-wrap').replaceWith(msg.content).fadeIn("slow");
+                    jQuery("body,html").scrollTop(jQuery("#oc-comments-wrap").offset().top - 200);
                 });
         return false;
     });
@@ -71,7 +110,7 @@ function bind_readComments()
 function bindLoginajax()
 {
     jQuery('.oc_comment_large_login_btn').off();
-    jQuery('.oc_comment_large_login_btn').on('click', function () {
+    jQuery(document.body).on('click','.oc_comment_large_login_btn', function () {
         //alert('Login box show.');
         jQuery.ajax({
             method: "GET",
@@ -91,8 +130,8 @@ function bindLoginajax()
 function bindReplyajax()
 {
     jQuery('.oc_comment_reply_btn').off('click');
-    jQuery('.oc_comment_reply_btn').on('click', function (e) {
-        if (jQuery('#oc_comment_submit_reply_btn').is(':visible'))
+    jQuery(document.body).on('click','.oc_comment_reply_btn', function (e) {
+        if (jQuery('#oc-comments-wrap #oc_comment_submit_reply_btn').is(':visible'))
         {
             var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
             formbox.fadeOut("slow");
@@ -100,7 +139,7 @@ function bindReplyajax()
         }
         jQuery.ajax({
             method: "GET",
-            url: "/oc/comments/ajax_form/reply"
+            url: "/oc/comments/ajax_form/reply/" + Drupal.settings.oc_comment.currentNid
         })
                 .done(function (msg) {
                     jQuery('#oc-comment-comment-ajax-reply-form').remove();
@@ -118,18 +157,20 @@ function bindReplyajax()
     });
 
     jQuery(document.body).on('click', '#oc_comment_submit_reply_btn', function (e) {
-        jQuery('.ui-dialog').remove();
+        debugger;
+        //jQuery('.ui-dialog').remove();
         //Get the current comment id being replied too.
         var node_id = Drupal.settings.oc_comment.currentNid;
         var parentid = Drupal.settings.oc_comment.selected_comment;
         var comment = document.getElementById("reply_comment_message").value;
         var comment_level = "";
+        var comment_subject = jQuery('#reply_comment_subject').val();
         //If id is -1 then we are creating a top-level comment.
         //This is safe as no comment id's are negative.
         jQuery.ajax({
             method: "GET",
             url: "/oc/comments/ajax_form/reply/submit/" + node_id + "/" + parentid + "/" + comment + "/"
-                    + Drupal.settings.oc_comment.selected_comment_level
+                    + Drupal.settings.oc_comment.selected_comment_level +"/"+comment_subject
         })
                 .done(function (msg) {
                     //did we submit with success ?
@@ -144,48 +185,57 @@ function bindReplyajax()
 }
 function InsertCommentReply(comment)
 {
-    var pid = comment.pid;
-    var cid = comment.cid;
-    var elem = jQuery('#cid-' + pid);
-    var sibling = elem.next();
-    debugger;
-    //check if there are existing comments.
-    if (sibling.hasClass('indented'))
-    {
-        var new_elem = jQuery(comment.markup);
-        new_elem.hide();
-        //new_elem.toggle();
-        sibling.append(new_elem);
-        if (sibling.is(':hidden'))
+        var pid = comment.pid;
+        var cid = comment.cid;
+        var elem = jQuery('#cid-' + pid);
+        var sibling = elem.next();
+        debugger;
+        //check if there are existing comments.
+        if (sibling.hasClass('indented'))
         {
-            sibling.fadeIn("slow");
+            var new_elem = jQuery(comment.markup);
+            new_elem.hide();
+            //new_elem.toggle();
+            sibling.append(new_elem);
+            if (sibling.is(':hidden'))
+            {
+                sibling.fadeIn("slow");
+            }
+            new_elem.fadeIn("slow");
+            jQuery("body,html").scrollTop(new_elem.offset().top - 200);
+            new_elem.pulsate({
+                reach: 20, // how far the pulse goes in px
+                speed: 1000, // how long one pulse takes in ms
+                pause: 0, // how long the pause between pulses is in ms
+                glow: true, // if the glow should be shown too
+                repeat: 1, // will repeat forever if true, if given a number will repeat for that many times
+                onHover: false                          // if true only pulsate if user hovers over the element
+            });
         }
-        new_elem.fadeIn("slow");
-        jQuery("body,html").scrollTop(new_elem.offset().top - 200);
-        new_elem.pulsate({
-            reach: 20, // how far the pulse goes in px
-            speed: 1000, // how long one pulse takes in ms
-            pause: 0, // how long the pause between pulses is in ms
-            glow: true, // if the glow should be shown too
-            repeat: 1, // will repeat forever if true, if given a number will repeat for that many times
-            onHover: false                          // if true only pulsate if user hovers over the element
-        });
+        else
+        {
+            var wrapper = jQuery('<div class="indented"></div>');
+            wrapper.append(comment.markup);
+            wrapper.hide();
+            elem.after(wrapper);
+            wrapper.fadeIn("slow");
+        }
+    if(Drupal.settings.oc_comment.skip_approval){
+         jQuery(".submit-form-error-message").append('<div class="messages status">Comment Postet</div>');
     }
     else
     {
-        var wrapper = jQuery('<div class="indented"></div>');
-        wrapper.append(comment.markup);
-        wrapper.hide();
-        elem.after(wrapper);
-        wrapper.fadeIn("slow");
+        jQuery(".submit-form-error-message").append('<div class="messages status">Comment awaiting admin approval</div>');
+        jQuery(".submit-form-error-message").focus();
     }
-    Init_buttons();
+    
+    //Init_buttons();
 }
 function bindDeleteajax()
 {
     //The button hook.
     jQuery('.oc_comment_delete_btn').off();
-    jQuery('.oc_comment_delete_btn').on('click', function (e) {
+    jQuery(document.body).on('click','.oc_comment_delete_btn', function (e) {
         if (jQuery('#oc_comment_submit_delete_confirm_btn').is(':visible'))
         {
             var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
@@ -243,8 +293,8 @@ function bindDeleteajax()
 function bindEditajax()
 {
     //Add so the popup opens
-    jQuery('.oc_comment_edit_btn').off();
-    jQuery('.oc_comment_edit_btn').on('click', function (e) {
+    //jQuery('.oc_comment_edit_btn').off();
+    jQuery(document.body ).on('click','.oc_comment_edit_btn', function (e) {
         if (jQuery('#edit_comment_message').is(':visible'))
         {
             var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
@@ -300,8 +350,8 @@ function bindEditajax()
 }
 function bindApproveajax()
 {
-    jQuery('.oc_comment_approve_btn').on('click', function (e) {
-        debugger;
+    jQuery(document.body).on('click','.oc_comment_approve_btn', function (e) {
+
         var cid = jQuery(e.currentTarget).parent().parent().find('#comment_id').val();
         //are you sure ?
         jQuery.ajax({

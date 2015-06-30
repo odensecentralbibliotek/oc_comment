@@ -68,7 +68,7 @@ function oc_comment_config_form() {
     );
     /*
      * How to sort the first level of comments 
-     * This is normaly the news first , so users always get the moste updatet.
+     * This is normaly the newest first , so users always get the moste updatet.
      */
     $form['oc_comment_top_level_sort'] = array(
         '#type' => 'select',
@@ -95,6 +95,13 @@ function oc_comment_config_form() {
         ),
         '#required' => TRUE,
     );
-
+    /*
+     * Should the children always be expanded ?
+     */
+    $form['oc_hide_children'] = array(
+      '#type' => 'checkbox', 
+      '#title' => t('Comment children always shown'),
+      );
+    
     return system_settings_form($form);
 }
