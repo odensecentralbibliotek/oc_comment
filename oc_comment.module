@@ -6,12 +6,12 @@ require_once('oc_comment.admin.php');
 
 function oc_comment_menu() {
      $items['admin/oc/comments/config'] = array(
-    'title' => 'Current posts',
+
     'description' => 'Configuration for the oc_comment module',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('oc_comment_config_form'),
     'access arguments' => array('access administration pages'),
-         
+     'type' => MENU_CALLBACK,    
   );
     
     $items['oc/comments/ajax/get'] = array(
