@@ -11,7 +11,6 @@ function oc_comment_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('oc_comment_config_form'),
     'access arguments' => array('access administration pages'),
-    'type' => MENU_NORMAL_ITEM,
          
   );
     
