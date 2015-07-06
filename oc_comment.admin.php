@@ -100,7 +100,8 @@ function oc_comment_config_form() {
      */
     $form['oc_hide_children'] = array(
       '#type' => 'checkbox', 
-      '#title' => t('Comment children always shown'),
+      '#title' => t('Hide comment children'),
+      '#default_value' => variable_get('oc_hide_children', 0),
       );
     
     return system_settings_form($form);

@@ -32,7 +32,7 @@ function toggle_spinner(selector, width, height, margin_left, margin_right)
 function bind_form_submit()
 {
     jQuery(document.body).on('click','#oc_comment_submit_form_btn', function (e) {
-        debugger;
+        jQuery(".submit-form-error-message").empty();
         var node_id = Drupal.settings.oc_comment.currentNid;
         var parentid = -1;
         var comment = document.getElementById("reply_comment_submit_message").value;
@@ -70,6 +70,7 @@ function bind_form_submit()
 function ajax_pager()
 {
     jQuery(document.body).on('click', '.pager li a', function (e) {
+        jQuery(".submit-form-error-message").empty();
         toggle_spinner();
         //get the target page.
         var page = jQuery(e.currentTarget).attr('href');
@@ -90,6 +91,7 @@ function ajax_pager()
 function bind_readComments()
 {
     jQuery(document.body).on('click', '.oc_comment_read_btn', function (e) {
+        jQuery(".submit-form-error-message").empty();
         var elem = jQuery(e.currentTarget).parent().parent(); // find the top div.
         var sibling = elem.next();
         //check if there are existing comments.
@@ -111,6 +113,7 @@ function bindLoginajax()
 {
     jQuery('.oc_comment_large_login_btn').off();
     jQuery(document.body).on('click','.oc_comment_large_login_btn', function () {
+        jQuery(".submit-form-error-message").empty();
         //alert('Login box show.');
         jQuery.ajax({
             method: "GET",
@@ -131,6 +134,7 @@ function bindReplyajax()
 {
     jQuery('.oc_comment_reply_btn').off('click');
     jQuery(document.body).on('click','.oc_comment_reply_btn', function (e) {
+        jQuery(".submit-form-error-message").empty();
         if (jQuery('#oc-comments-wrap #oc_comment_submit_reply_btn').is(':visible'))
         {
             var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
@@ -158,6 +162,7 @@ function bindReplyajax()
 
     jQuery(document.body).on('click', '#oc_comment_submit_reply_btn', function (e) {
         debugger;
+        
         //jQuery('.ui-dialog').remove();
         //Get the current comment id being replied too.
         var node_id = Drupal.settings.oc_comment.currentNid;
@@ -236,6 +241,7 @@ function bindDeleteajax()
     //The button hook.
     jQuery('.oc_comment_delete_btn').off();
     jQuery(document.body).on('click','.oc_comment_delete_btn', function (e) {
+        jQuery(".submit-form-error-message").empty();
         if (jQuery('#oc_comment_submit_delete_confirm_btn').is(':visible'))
         {
             var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
@@ -264,7 +270,7 @@ function bindDeleteajax()
     });
     //Dialog submit.
     jQuery(document.body).on('click', '#oc_comment_submit_delete_confirm_btn', function (e) {
-
+        
 
         //Get the current comment id being replied too.
         var comment_edit_id = Drupal.settings.oc_comment.selected_comment;
@@ -295,6 +301,7 @@ function bindEditajax()
     //Add so the popup opens
     //jQuery('.oc_comment_edit_btn').off();
     jQuery(document.body ).on('click','.oc_comment_edit_btn', function (e) {
+        jQuery(".submit-form-error-message").empty();
         if (jQuery('#edit_comment_message').is(':visible'))
         {
             var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
@@ -351,7 +358,7 @@ function bindEditajax()
 function bindApproveajax()
 {
     jQuery(document.body).on('click','.oc_comment_approve_btn', function (e) {
-
+        jQuery(".submit-form-error-message").empty();
         var cid = jQuery(e.currentTarget).parent().parent().find('#comment_id').val();
         //are you sure ?
         jQuery.ajax({
@@ -362,7 +369,7 @@ function bindApproveajax()
             //hide button and somehow show success
             var replybtn = jQuery('<a href="/" class="oc_comment_reply_btn oc_comment_btn">Reply</a>');
             replybtn.prop('id', cid);
-            jQuery('#cid-' + cid).find('.oc_comment_approve_btn').replace(replybtn);
+            jQuery('#cid-' + cid).find('.oc_comment_approve_btn').replaceWith(replybtn);
             jQuery('#cid-' + cid).css('background-color', 'white');
         });
         //start approving.

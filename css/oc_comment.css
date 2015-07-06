@@ -53,6 +53,7 @@ and open the template in the editor.
     border: 1px solid lightgray;
     float: right;
     margin-left: 3px;
+    margin-top: 5px;
 }
 .comment-form .form-textarea 
 {
@@ -82,6 +83,12 @@ and open the template in the editor.
 }
 .indented
 {
+    
+}
+.indented-shown{
+    display: block;
+}
+.indented-hidden{
     display:none;
 }
 .oc_comment_btn

@@ -7,6 +7,7 @@
  * $is_child = shows if we are dealing with a child comment.
  */
     $html = "";
+    $node = node_load($entity->parent->nid);
     $comment_user = user_load($entity->parent->uid);
     $full_name = isset($comment_user->data['display_name']) ? $comment_user->data['display_name'] : $comment_user->name;
     /*
@@ -30,7 +31,13 @@
     $html.= "<input type='hidden' id='comment_level' value='" . $current_level . "' />\n";
     $html.= "<input type='hidden' id='comment_id' value='" . $entity->parent->cid . "' />\n";
     $html.= "<div class='submitted'><b>" . $full_name . " - " . date("d-m-Y H:i", $entity->parent->created) . "</b></div>\n";
-    $html.= "<div class='content'>" . oc_comment_get_comment_body($entity->parent->cid) . "</div>\n";
+    $html.= "<div class='content'>";
+    if(variable_get('comment_subject_field_' . $node->type, 0))
+    {
+        $html.= "<h2>" . $entity->parent->subject . "</h2>";
+    }
+    $html.=  oc_comment_get_comment_body($entity->parent->cid);
+    $html.=  "</div>\n";
     $html.= "<div style='text-align: right !important' class='comment_toolbar'>\n";
     //Is current level allowed to comment ? if not then dont display comment count
     if ($current_level < variable_get('oc_comment_max_reply_level', 1) && sizeof($entity->children) != 0) {

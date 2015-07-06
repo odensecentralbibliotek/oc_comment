@@ -72,14 +72,21 @@ function oc_comment_get_comment_body($cid) {
     $comment = entity_load('comment', array($cid));
     $comment = reset($comment);
     $entity = entity_metadata_wrapper('comment', $comment);
-    return check_markup($entity->comment_body->value());
+    $value = $entity->comment_body->value();
+    if(is_array($value))
+    {
+        return $value['value'];
+    }
+    else
+    {
+      return $value;
+    }
 }
 
 /*
  * Rendering of comment entities.
  * The \n are added to make it easier to debug in browser.
  */
-
 function render_single_comment_entity($entity, $current_level, $is_child = false) {
     
     return theme('oc_comment_item',array('entity' => $entity,'current_level' => $current_level,'is_child' => $is_child));
@@ -90,3 +97,27 @@ function oc_comments_user_check_validation($msg = null, $required_role = null) {
         drupal_exit();
     }
 }
+function oc_comment_recursive_delete($cid,$pid = null)
+{
+    //are just starting ?
+    $Top_level_sort = variable_get('oc_comment_top_level_sort', 'DESC');
+    $result = db_query("SELECT * FROM comment WHERE cid = :cid  ORDER BY created {$Top_level_sort} ", array(':cid' => $cid));
+    foreach($result as $index => $top_comment)
+    {
+         $child_nodes = db_query("SELECT * FROM comment WHERE nid = :nid AND pid = :pid  ORDER BY created {$Child_level_sort}", array(':nid' => $node->nid, ':pid' => $top_comment->cid));
+         $child_nodes = $child_nodes->fetchAll();
+         //do we have more children ? 
+         if(sizeof($child_nodes))
+         {
+             //For all children
+             foreach($child_nodes as $i => $child)
+             {
+                 //Check if deeper level children and delete.
+                 oc_comment_recursive_delete($child->cid);
+                 db_query("DELETE FROM comment WHERE cid = :cid", array(':cid' => $child->cid));
+             }
+             
+         }
+    }
+}
+

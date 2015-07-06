@@ -161,7 +161,7 @@ function oc_comment_block_view($delta='') {
           case 'oc_comments_block' :
           {
             $Comments_render_arrary = oc_comments_build_comment_array($node);
-            $block['content'] = GenerateHtmlContent($Comments_render_arrary);
+            $block['content'] = GenerateHtmlContent($Comments_render_arrary,$node);
             break;
           }
           case 'oc_comments_form_submit_block' :
@@ -195,11 +195,12 @@ function oc_comment_block_view($delta='') {
 /*
  * Genarate all the needed html to display the comment block properly.
  */
-function GenerateHtmlContent($comments)
+function GenerateHtmlContent($comments,$node)
 {
+    //$per_page = variable_get('oc_comment_pr_page' , 5);
     global $user;
     $level = 1;    
-    $per_page = variable_get('oc_comment_pr_page' , 5);
+    $per_page = variable_get('comment_default_per_page_' . $node->type, 50);
     $current_page = pager_default_initialize(count($comments), $per_page);
     // Split your list into page sized chunks
     $chunks = array_chunk($comments, $per_page, TRUE);
@@ -233,7 +234,15 @@ function recursive_render_comment_children($children,$parent_comment,$current_le
 {
     if(sizeof($children))
     {
-        $html = "<div class='indented'>";
+        if(variable_get('oc_hide_children',0))
+        {
+            $html = "<div class='indented indented-hidden'>";
+        }
+        else
+        {
+            $html = "<div class='indented indented-shown'>";
+        }
+       
         foreach($children as $index => $comment)
         {
             $html .= render_single_comment_entity($comment,$current_level,true);
@@ -459,4 +468,28 @@ function oc_comment_form_comment_form_alter(&$form,$form_state)
 function oc_comment_form_ding_user_comment_forbidden_form_alter(&$form,$form_state)
 {
     hide($form['submit']);
+}
+function oc_comment_node_view_alter(&$build)
+{
+    if(isset($build['links']['node']['comment']))
+    {
+       hide($build['links']['node']['comment']);
+    }
+}
+function oc_comment_views_pre_render(&$view) {
+    if($view->name == "admin_views_comment")
+    {
+        foreach($view->result as $index => $comment_data)
+        {
+            //is it a ding user ? without a proper name.
+        
+            //load the user
+            $user = user_load($comment_data->_field_data['cid']['entity']->uid);
+            if(isset($user->data['display_name']))
+            {
+              $comment_data->comment_name = $user->data['display_name'];
+            }
+        }
+        
+    }
 }
