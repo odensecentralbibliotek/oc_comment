@@ -19,6 +19,8 @@ and open the template in the editor.
     padding: 5px;
     float:left;
     width: 97%;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px;
 }
 #comment_logo
 {

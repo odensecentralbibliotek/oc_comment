@@ -28,8 +28,10 @@
             break;
         }
     }
+    $html.= "<input type='hidden' id='comment_parent' value='" . $entity->parent->pid . "' />\n";
     $html.= "<input type='hidden' id='comment_level' value='" . $current_level . "' />\n";
     $html.= "<input type='hidden' id='comment_id' value='" . $entity->parent->cid . "' />\n";
+    $html.= "<input type='hidden' id='comment_count' value='" . sizeof($entity->children) . "' />\n";
     $html.= "<div class='submitted'><b>" . $full_name . " - " . date("d-m-Y H:i", $entity->parent->created) . "</b></div>\n";
     $html.= "<div class='content'>";
     if(variable_get('comment_subject_field_' . $node->type, 0))
@@ -47,8 +49,8 @@
         $html .= oc_comment_get_buttons($entity->parent, $current_level);
     } else {
         //reassign here to avoid strict warning. php dont like too many statements together
-        $parent = entity_load('comment', array($entity->parent->pid));
-        $parent = reset($parent);
+        $parent_entity = entity_load('comment', array($entity->parent->pid));
+        $parent = reset($parent_entity);
         $tmp = $entity;
         $html .= oc_comment_get_buttons($tmp->parent, $current_level, $parent);
     }

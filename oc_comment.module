@@ -258,7 +258,7 @@ function recursive_render_comment_children($children,$parent_comment,$current_le
     }
     else
     {
-        return "<div>\n</div>";
+        return "<div class='indented indented-shown'>\n</div>";
     }
 }
 /*
@@ -323,10 +323,10 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
              */
             if(user_access('administer comments'))
             {
-                    $button_html .= l(t('Delete'),'',array('attributes' => array('class' => 'oc_comment_delete_btn oc_comment_btn',
-                    'id' => $comment->cid)));
-
                     $button_html .= l(t('Edit'),'',array('attributes' => array('class' => 'oc_comment_edit_btn oc_comment_btn',
+                    'id' => $comment->cid)));
+                    
+                    $button_html .= l(t('Delete'),'',array('attributes' => array('class' => 'oc_comment_delete_btn oc_comment_btn',
                     'id' => $comment->cid)));
             }
         }
@@ -424,7 +424,7 @@ function oc_comment_ajax_delete_submit_form($cid)
      * to be compatible with the CRUD api. 
      * see: http://www.drupalcontrib.org/api/drupal/contributions!entity!entity.module/function/entity_delete_multiple/7
      */
-    $success = entity_delete('comment', $cid);
+    oc_comment_recursive_delete($cid);
     if(!$success)
     {
         echo "1";
