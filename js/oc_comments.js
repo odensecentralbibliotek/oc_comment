@@ -42,8 +42,9 @@ function bind_form_submit()
         //This is safe as no comment id's are negative.
         jQuery.ajax({
             method: "GET",
-            url: "/oc/comments/ajax_form/reply/submit/" + node_id + "/" + parentid + "/" + comment + "/"
-                    + Drupal.settings.oc_comment.selected_comment_level +"/"+comment_subject
+            url: "/oc/comments/ajax_form/reply/submit/" + node_id + "/" + parentid + "/" +'filler'+ "/"
+                    + Drupal.settings.oc_comment.selected_comment_level +"/"+'filler2',
+            data: {'comment_body':comment,'subject':comment_subject}
         })
                 .done(function (msg) {
                     //insert the created comment.
@@ -164,6 +165,7 @@ function bindReplyajax()
         
         //jQuery('.ui-dialog').remove();
         //Get the current comment id being replied too.
+        debugger;
         var node_id = Drupal.settings.oc_comment.currentNid;
         var parentid = Drupal.settings.oc_comment.selected_comment;
         var comment = document.getElementById("reply_comment_message").value;
@@ -173,10 +175,12 @@ function bindReplyajax()
         //This is safe as no comment id's are negative.
         jQuery.ajax({
             method: "GET",
-            url: "/oc/comments/ajax_form/reply/submit/" + node_id + "/" + parentid + "/" + comment + "/"
-                    + Drupal.settings.oc_comment.selected_comment_level +"/"+comment_subject
+            url: "/oc/comments/ajax_form/reply/submit/" + node_id + "/" + parentid + "/" + 'filler' + "/"
+                    + Drupal.settings.oc_comment.selected_comment_level +"/"+'filler2',
+            data: {'comment_body':comment,'subject':comment_subject}
         })
                 .done(function (msg) {
+                    debugger;
                     //did we submit with success ?
                     var comment = jQuery('#cid-' + Drupal.settings.oc_comment.selected_comment);
                     reply_update_comment_count( Drupal.settings.oc_comment.selected_comment);
@@ -345,11 +349,13 @@ function bindEditajax()
         //Get the current comment id being replied too.
         var comment_edit_id = Drupal.settings.oc_comment.selected_comment;
         var comment = jQuery('#edit_comment_message').val();
+        var comment_subject = "";
         //If id is -1 then we are creating a top-level comment.
         //This is safe as no comment id's are negative.
         jQuery.ajax({
             method: "GET",
-            url: "/oc/comments/ajax_form/edit/submit/" + comment_edit_id + "/" + comment
+            url: "/oc/comments/ajax_form/edit/submit/" + comment_edit_id + "/" + 'filler',
+            data: {'comment_body':comment,'subject': comment_subject}
         })
                 .done(function (msg) {
                     //did we submit with success ?

@@ -346,7 +346,7 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
 {
     global $language;
     global $user;
-    if(strlen($comment_body) > 0 && user_is_logged_in())
+    if(isset($_GET['comment_body']) && strlen($_GET['comment_body']) > 0 && user_is_logged_in())
     {
         $comment = new stdClass();
         $comment->nid = $nodeid; // nid of a node you want to attach a comment to
@@ -362,9 +362,9 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $comment->homepage = ''; // you can add homepage URL here
         $comment->status = user_access('skip comment approval') ? COMMENT_PUBLISHED : COMMENT_NOT_PUBLISHED; // We auto-publish this comment
         $comment->language = LANGUAGE_NONE; // The same as for a node
-        $comment->subject = $subject == 'undefined' ? t('No subject') : $subject; 
+        $comment->subject = $_GET['subject'] == 'undefined' ? t('No subject') : $_GET['subject']; 
         $comment->node_type = 'comment_node_ding_news';
-        $comment->comment_body[LANGUAGE_NONE][0]['value'] = check_plain($comment_body); // Everything here is pretty much like with a node
+        $comment->comment_body[LANGUAGE_NONE][0]['value'] = check_plain($_GET['comment_body']); // Everything here is pretty much like with a node
         $comment->comment_body[LANGUAGE_NONE][0]['format'] = 3;        
         $entity = entity_create('comment', (array)$comment);
         $entity = entity_metadata_wrapper('comment',  $entity);
@@ -393,9 +393,9 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
     oc_comments_user_check_validation(); // make sure user is logged in.
     $entity = reset(entity_load('comment',array($cid)));
     
-    if($entity->comment_body[LANGUAGE_NONE][0]['value'] != $comment_body)
+    if($entity->comment_body[LANGUAGE_NONE][0]['value'] != $_GET['comment_body'])
     {
-        $entity->comment_body[LANGUAGE_NONE][0]['value'] =  check_plain($comment_body);
+        $entity->comment_body[LANGUAGE_NONE][0]['value'] =  check_plain($_GET['comment_body']);
         $entity_wrap = entity_metadata_wrapper('comment',  $entity);
         if($entity_wrap->save())
         {
