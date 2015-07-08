@@ -47,6 +47,7 @@ function oc_comment_menu() {
     'page callback' => 'oc_comment_ajax_reply_submit_form', // Render HTML
     'description' => 'handles form submit and creation of new comment.',
     'page arguments' => array(5,6,7,8,9),
+    'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
@@ -62,6 +63,7 @@ function oc_comment_menu() {
     'page callback' => 'oc_comment_ajax_edit_submit_form', // Render HTML
     'description' => 'saves comment edits',
     'page arguments' => array(5,6),
+    'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
