@@ -39,15 +39,6 @@ function oc_comment_comment_submit_form($form, &$form_state) {
         '#id' => 'oc_comment_submit_form_btn',
         '#href' => "#",
     );
-    $form['cancel_button'] = array(
-        '#type' => 'button',
-        '#value' => t('Cancel'),
-        '#id' => 'oc_comment_submit_form_cancel_btn',
-        '#attributes' => array(
-            'onclick' => "",
-            'class' => array("oc_comment_btn"),
-        )
-    );
     return $form;
 }
 function oc_comment_comment_ajax_reply_form($form, &$form_state) {
