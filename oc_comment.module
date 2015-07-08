@@ -144,24 +144,33 @@ function oc_comment_block_view($delta='') {
     {
         global $user;
         $skip_approval = user_access('skip comment approval',$user) ? 1 : 0;
+        $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
+        $max_reply_level = variable_get('oc_comment_max_reply_level', 0);
         $setting = array('oc_comment' => array('currentNid' => $node->nid,'skip_approval' => $skip_approval));
+       
         drupal_add_js($setting, 'setting');
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/oc_comments.js');
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/jquery.pulsate.js');
         drupal_add_css(drupal_get_path('module', 'oc_comment') . '/css/oc_comment.css');
-
-        //Get the comments of the current node.
-        $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
-        $max_reply_level = variable_get('oc_comment_max_reply_level', 0);
-  
         
-        // Initialize the pager
+        
+ 
         $block = array();
         switch($delta) {
           case 'oc_comments_block' :
           {
-            $Comments_render_arrary = oc_comments_build_comment_array($node);
-            $block['content'] = GenerateHtmlContent($Comments_render_arrary,$node);
+            $oc_comments_data = &drupal_static(__FUNCTION__);
+            if (!isset($oc_comments_data)) { 
+                if ($cache = cache_get('oc_comments_data')) {
+                    $block['content'] = $cache->data;
+                  }
+                  else
+                  {
+                      $Comments_render_arrary = oc_comments_build_comment_array($node);
+                      $block['content'] = GenerateHtmlContent($Comments_render_arrary,$node);
+                      cache_set('oc_comments_data',$block['content'],'cache');
+                  }
+            }
             break;
           }
           case 'oc_comments_form_submit_block' :
@@ -174,11 +183,9 @@ function oc_comment_block_view($delta='') {
                {
                    $block['content'] = '';
                }
-              
               break;
           }
         }
-        $tmp = current_path();
         if($ajax ==  1)
         {
             drupal_json_output($block);
@@ -204,16 +211,7 @@ function GenerateHtmlContent($comments,$node)
     $current_page = pager_default_initialize(count($comments), $per_page);
     // Split your list into page sized chunks
     $chunks = array_chunk($comments, $per_page, TRUE);
-    $html = "<div id='oc-comments-wrap'>";
-    /*
-     * If user is not logged in , show the login button on top of the comments.
-     */
-    if(!user_is_logged_in())
-    {
-        $html .= "<div id='oc-comment-login-btn-wrap'>";
-        $html .= l(t('Login To Comment'),'',array('attributes' => array('class' => 'oc_comment_large_login_btn btn btn-info')));
-        $html .= "</div>";
-    }
+    $html = "";
     foreach($chunks[$current_page] as $index => $comment)
     {
         if($comment->parent->status == 1 || in_array('administrator', $user->roles) || $comment->parent->uid == $user->uid)
@@ -223,7 +221,8 @@ function GenerateHtmlContent($comments,$node)
         }
     }
     $html .= theme('pager', array('quantity',count($comments)));
-    $html .= "</div>\n";
+    $html = theme('oc_comment_wrap',array('wrap_data' => $html));
+
     return $html;
 }
 /*
@@ -377,6 +376,7 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $obj->children = array();
                 
         $comment->markup = render_single_comment_entity($obj,$current_level,true);
+        cache_clear_all('oc_comments_data', 'cache', TRUE);
         drupal_json_output($comment);
         
     }
@@ -437,14 +437,15 @@ function oc_comment_ajax_delete_submit_form($cid)
 }
 function oc_comment_ajax_approve_comment($cid)
 {
-     oc_comments_user_check_validation(); // make sure user is logged in.
-      $entity = reset(entity_load('comment',array($cid)));
-      $entity_wrap = entity_metadata_wrapper('comment',  $entity);
-      $entity_wrap->status = 1;
+    oc_comments_user_check_validation(); // make sure user is logged in.
+    $entity = reset(entity_load('comment',array($cid)));
+    $entity_wrap = entity_metadata_wrapper('comment',  $entity);
+    $entity_wrap->status = 1;
     //is user logged in and has correct roles ?
         //approve comment :)
     if($entity_wrap->save())
     {
+        cache_clear_all('oc_comments_data', 'cache', TRUE);
         echo "1";
     }
     else
@@ -458,6 +459,11 @@ function oc_comment_theme($existing, $type, $theme, $path) {
       'path' => $path . '/templates',
       'template' => 'oc-comment-item',
        'arguments' => array('oc_comments' => null), //define $xxx so it will available in your xxx-xxx.tpl.php
+    ),
+    'oc_comment_wrap' => array(
+        'path' => $path . '/templates',
+        'template' => 'oc_comment_wrap',
+        'arguments' => array('wrap_data' => null),
     ));
 }
 function oc_comment_form_comment_form_alter(&$form,$form_state)
