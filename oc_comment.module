@@ -145,7 +145,7 @@ function oc_comment_block_view($delta='') {
         global $user;
         $skip_approval = user_access('skip comment approval',$user) ? 1 : 0;
         $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
-        $max_reply_level = variable_get('oc_comment_max_reply_level', 0);
+        $max_reply_level = variable_get('oc_comment_max_reply_level_'. $node->type, 0);
         $setting = array('oc_comment' => array('currentNid' => $node->nid,'skip_approval' => $skip_approval));
        
         drupal_add_js($setting, 'setting');
@@ -153,24 +153,27 @@ function oc_comment_block_view($delta='') {
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/jquery.pulsate.js');
         drupal_add_css(drupal_get_path('module', 'oc_comment') . '/css/oc_comment.css');
         
-        
- 
         $block = array();
         switch($delta) {
           case 'oc_comments_block' :
           {
-            $oc_comments_data = &drupal_static(__FUNCTION__);
+           $Comments_render_arrary = &drupal_static(__FUNCTION__);
             if (!isset($oc_comments_data)) { 
-                if ($cache = cache_get('oc_comments_data')) {
-                    $block['content'] = $cache->data;
+                $cache = cache_get('oc_comments_data');
+                if (isset($cache->data) && is_array($cache->data)) {
+                    $Comments_render_arrary = $cache->data;
                   }
                   else
                   {
                       $Comments_render_arrary = oc_comments_build_comment_array($node);
-                      $block['content'] = GenerateHtmlContent($Comments_render_arrary,$node);
-                      cache_set('oc_comments_data',$block['content'],'cache');
+                      cache_set('oc_comments_data',$Comments_render_arrary,'cache');
                   }
             }
+            else
+            {
+                $block['content'] = $oc_comments_data;
+            }
+            $block['content'] = GenerateHtmlContent($Comments_render_arrary,$node);
             break;
           }
           case 'oc_comments_form_submit_block' :
@@ -217,7 +220,7 @@ function GenerateHtmlContent($comments,$node)
         if($comment->parent->status == 1 || in_array('administrator', $user->roles) || $comment->parent->uid == $user->uid)
         {
             $html .= render_single_comment_entity($comment,0);
-            $html .= recursive_render_comment_children($comment->children,$comment);
+            $html .= recursive_render_comment_children($comment->children,$comment,1,$node);
         }
     }
     $html .= theme('pager', array('quantity',count($comments)));
@@ -229,11 +232,11 @@ function GenerateHtmlContent($comments,$node)
  * Recursively generate html for all child nodes in the array.
  * children always start at level 1
  */
-function recursive_render_comment_children($children,$parent_comment,$current_level = 1)
+function recursive_render_comment_children($children,$parent_comment,$current_level = 1,$node)
 {
     if(sizeof($children))
     {
-        if(variable_get('oc_hide_children',0))
+        if(variable_get('oc_hide_children_'. $node->type,0))
         {
             $html = "<div class='indented indented-hidden'>";
         }
@@ -247,7 +250,7 @@ function recursive_render_comment_children($children,$parent_comment,$current_le
             $html .= render_single_comment_entity($comment,$current_level,true);
             
             //Node has children. render these aswell.
-            if(sizeof($comment->children) && $current_level < variable_get('oc_comment_max_reply_level', 1))
+            if(sizeof($comment->children) && $current_level < variable_get('oc_comment_max_reply_level_'. $node->type, 1))
             {
                 $html .= recursive_render_comment_children($comment->children,$comment->parent,$current_level+1);
             }
@@ -263,7 +266,7 @@ function recursive_render_comment_children($children,$parent_comment,$current_le
 /*
  * Build the comment box toolbar.
  */
-function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
+function oc_comment_get_buttons($comment,$current_level,$parent_comment = null,$node = null)
 {
     global $user;
     //if current user is logged in
@@ -284,7 +287,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
              * always check if the current level allows reply's !
              *
              */
-            if(user_access('post comments')  && $current_level < variable_get('oc_comment_max_reply_level', 1) && $comment->status != 0)
+            if(user_access('post comments')  && $current_level < variable_get('oc_comment_max_reply_level_'. $node->type, 1) && $comment->status != 0)
             {
                 $button_html .= l(t('Reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
                 'id' => $comment->cid)));
@@ -312,7 +315,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null)
              * User can post new/reply to comments.
              * always check if the current level allows reply's !
              */
-            if(user_access('post comments') && $current_level < variable_get('oc_comment_max_reply_level', 1) && $comment->status != 0)
+            if(user_access('post comments') && $current_level < variable_get('oc_comment_max_reply_level_'. $node->type, 1) && $comment->status != 0)
             {
                 $button_html .= l(t('Reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
                 'id' => $comment->cid)));
@@ -376,7 +379,7 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $obj->children = array();
                 
         $comment->markup = render_single_comment_entity($obj,$current_level,true);
-        cache_clear_all('oc_comments_data', 'cache', TRUE);
+        cache_set('oc_comments_data',null,'cache');
         drupal_json_output($comment);
         
     }
@@ -396,6 +399,7 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
         $entity_wrap = entity_metadata_wrapper('comment',  $entity);
         if($entity_wrap->save())
         {
+            cache_set('oc_comments_data',null,'cache');
             drupal_json_output($entity);
             drupal_exit();
         }
@@ -427,6 +431,7 @@ function oc_comment_ajax_delete_submit_form($cid)
     oc_comment_recursive_delete($cid);
     if(!$success)
     {
+        cache_set('oc_comments_data',null,'cache');
         echo "1";
     }
     else
@@ -445,7 +450,7 @@ function oc_comment_ajax_approve_comment($cid)
         //approve comment :)
     if($entity_wrap->save())
     {
-        cache_clear_all('oc_comments_data', 'cache', TRUE);
+        cache_set('oc_comments_data',null,'cache');
         echo "1";
     }
     else
@@ -477,9 +482,9 @@ function oc_comment_form_ding_user_comment_forbidden_form_alter(&$form,$form_sta
 }
 function oc_comment_node_view_alter(&$build)
 {
-    if(isset($build['links']['node']['comment']))
+    if(isset($build['links']['comment']))
     {
-       hide($build['links']['node']['comment']);
+       hide($build['links']['comment']);
     }
 }
 function oc_comment_views_pre_render(&$view) {

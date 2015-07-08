@@ -53,6 +53,7 @@ function oc_comment_comment_submit_form($form, &$form_state) {
 function oc_comment_comment_ajax_reply_form($form, &$form_state) {
     $nid = $form_state['build_info']['args'][0];
     $node = node_load($nid);
+
     if(variable_get('comment_subject_field_' . $node->type, 0))
     {
        $form['comment_subject'] = array(

@@ -132,3 +132,15 @@ and open the template in the editor.
 {
     background: lightcyan;
 }
+.comment_content
+{
+    padding: 5px;
+    font-size: 17px;
+}
+.oc_comments_reply_bar
+{
+    background-color: #69c8cf;
+    padding: 10px;
+    cursor: pointer;
+    width: 100%;
+}

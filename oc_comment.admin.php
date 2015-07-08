@@ -2,6 +2,7 @@
 
 function oc_comment_config_form() {
     $form = array();
+    
     $form['oc_comments_fieldset_logo'] = array(
         '#type' => 'fieldset',
         '#title' => t('Employee banner Settings'),
@@ -45,6 +46,10 @@ function oc_comment_config_form() {
             ),
         ),
     );
+    return system_settings_form($form);
+}
+function oc_comment_form_node_type_form_alter(&$form, $form_state)
+{
     /*
      * How many levels of comments are available ?
      * 1 = only the top level comment can be reply'd too.
@@ -52,10 +57,21 @@ function oc_comment_config_form() {
      * and so on.
      * Normal settings woult be 1 or 2.
      */
-    $form['oc_comment_max_reply_level'] = array(
+    hide($form['comment']['comment_form_location']);
+    hide($form['comment']['comment_preview']);
+    hide($form['comment']['comment_default_mode']);
+    /*
+     * Should the children always be expanded ?
+     */
+    $form['comment']['oc_hide_children'] = array(
+      '#type' => 'checkbox', 
+      '#title' => t('Hide comment children'),
+      '#default_value' => variable_get('oc_hide_children_'.$form['#node_type']->type, 0),
+      );
+    $form['comment']['oc_comment_max_reply_level'] = array(
         '#type' => 'select',
         '#title' => t('Maximum reply level:'),
-        '#default_value' => variable_get('oc_comment_max_reply_level', 1),
+        '#default_value' => variable_get('oc_comment_max_reply_level_'.$form['#node_type']->type, 1),
         '#options' => array(
             0 => '0',
             1 => '1',
@@ -70,10 +86,10 @@ function oc_comment_config_form() {
      * How to sort the first level of comments 
      * This is normaly the newest first , so users always get the moste updatet.
      */
-    $form['oc_comment_top_level_sort'] = array(
+    $form['comment']['oc_comment_top_level_sort'] = array(
         '#type' => 'select',
         '#title' => t('Sorting of top level comments'),
-        '#default_value' => variable_get('oc_comment_top_level_sort', 'DESC'),
+        '#default_value' => variable_get('oc_comment_top_level_sort_'.$form['#node_type']->type, 'DESC'),
         '#options' => array(
             'ASC' => 'ASCENDING',
             'DESC' => 'DESCENDING',
@@ -85,24 +101,15 @@ function oc_comment_config_form() {
      * the conversation , instead of scrolling to the bottom to get the
      * red line.
      */
-    $form['oc_comment_child_level_sort'] = array(
+    $form['comment']['oc_comment_child_level'] = array(
         '#type' => 'select',
         '#title' => t('Sorting of child level comments'),
-        '#default_value' => variable_get('oc_comment_child_level_sort', 'ASC'),
+        '#default_value' => variable_get('oc_comment_child_level_sort_'.$form['#node_type']->type, 'ASC'),
         '#options' => array(
             'ASC' => 'ASCENDING',
             'DESC' => 'DESCENDING',
         ),
         '#required' => TRUE,
     );
-    /*
-     * Should the children always be expanded ?
-     */
-    $form['oc_hide_children'] = array(
-      '#type' => 'checkbox', 
-      '#title' => t('Hide comment children'),
-      '#default_value' => variable_get('oc_hide_children', 0),
-      );
-    
-    return system_settings_form($form);
+
 }

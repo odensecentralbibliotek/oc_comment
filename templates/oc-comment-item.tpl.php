@@ -33,7 +33,7 @@
     $html.= "<input type='hidden' id='comment_id' value='" . $entity->parent->cid . "' />\n";
     $html.= "<input type='hidden' id='comment_count' value='" . sizeof($entity->children) . "' />\n";
     $html.= "<div class='submitted'><b>" . $full_name . " - " . date("d-m-Y H:i", $entity->parent->created) . "</b></div>\n";
-    $html.= "<div class='content'>";
+    $html.= "<div class='comment_content'>";
     if(variable_get('comment_subject_field_' . $node->type, 0))
     {
         $html.= "<h2>" . $entity->parent->subject . "</h2>";
@@ -42,17 +42,17 @@
     $html.=  "</div>\n";
     $html.= "<div style='text-align: right !important' class='comment_toolbar'>\n";
     //Is current level allowed to comment ? if not then dont display comment count
-    if ($current_level < variable_get('oc_comment_max_reply_level', 1) && sizeof($entity->children) != 0) {
+    if ($current_level < variable_get('oc_comment_max_reply_level_' . $node->type, 1) && sizeof($entity->children) != 0) {
         $html.= '<a class="oc_comment_btn oc_comment_read_btn">' . sizeof($entity->children) . ' ' . t('comments') . '</a>';
     }
     if ($entity->parent->pid == 0) {
-        $html .= oc_comment_get_buttons($entity->parent, $current_level);
+        $html .= oc_comment_get_buttons($entity->parent, $current_level,null,$node);
     } else {
         //reassign here to avoid strict warning. php dont like too many statements together
         $parent_entity = entity_load('comment', array($entity->parent->pid));
         $parent = reset($parent_entity);
         $tmp = $entity;
-        $html .= oc_comment_get_buttons($tmp->parent, $current_level, $parent);
+        $html .= oc_comment_get_buttons($tmp->parent, $current_level, $parent,$node);
     }
 
     $html.= "</div>\n";

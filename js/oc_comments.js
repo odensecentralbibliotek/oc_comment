@@ -310,7 +310,7 @@ function bindEditajax()
     //Add so the popup opens
     //jQuery('.oc_comment_edit_btn').off();
     jQuery(document.body ).on('click','.oc_comment_edit_btn', function (e) {
-        jQuery(".submit-form-error-message").empty();
+        jQuery(".submi.t-form-error-message").empty();
         if (jQuery('#edit_comment_message').is(':visible'))
         {
             var formbox = jQuery(e.currentTarget).parent().parent().find('.oc-comment-form-box');
@@ -323,10 +323,11 @@ function bindEditajax()
             url: "/oc/comments/ajax_form/edit"
         })
                 .done(function (msg) {
+                    debugger;
                     jQuery('#oc-comment-comment-ajax-edit-form').remove();
                     //Show the Login in a dialog.
                     var tmp = e.currentTarget.getAttribute('id');
-                    var old_text = jQuery(e.currentTarget).parent().parent().find('.content').text();
+                    var old_text = jQuery(e.currentTarget).parent().parent().find('.comment_content').text();
                     Drupal.settings.oc_comment.selected_comment = tmp;
                     Drupal.settings.oc_comment.selected_comment_old_text = old_text;
                     var tmp = jQuery(msg);
@@ -353,7 +354,7 @@ function bindEditajax()
                 .done(function (msg) {
                     //did we submit with success ?
                     var tmp = jQuery('#cid-' + comment_edit_id);
-                    var tmp2 = tmp.find('.content');
+                    var tmp2 = tmp.find('.comment_content');
                     tmp2.text(msg.comment_body.und[0].value);
 
                     var comment = tmp;
