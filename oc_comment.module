@@ -431,6 +431,7 @@ function oc_comment_ajax_delete_submit_form($cid)
      * see: http://www.drupalcontrib.org/api/drupal/contributions!entity!entity.module/function/entity_delete_multiple/7
      */
     oc_comment_recursive_delete($cid);
+    cache_set('oc_comments_data',null,'cache');
     if(!$success)
     {
         cache_set('oc_comments_data',null,'cache');
