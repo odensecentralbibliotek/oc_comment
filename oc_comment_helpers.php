@@ -3,7 +3,6 @@
 /*
  * Builds a proper child node data structure for easier usage later.
  */
-
 function recursive_get_child_arrays($comment) {
     $result = array();
     $child_nodes = db_query('SELECT * FROM comment WHERE nid = :nid AND pid = :pid', array(':nid' => $comment->nid, ':pid' => $comment->cid));
@@ -16,14 +15,12 @@ function recursive_get_child_arrays($comment) {
     //Build comments and get their children
     return $result;
 }
-
 /*
  * Builds a new and better comments array for the custom render function.
  * It improves the thread handling immensely and makes working with the comments
  * easier.
  * option: make it more drupal.
  */
-
 function oc_comments_build_comment_array($node) {
     /*
      * Select all the top level comments.
@@ -122,5 +119,6 @@ function oc_comment_recursive_delete($cid)
          }
          entity_delete('comment', $top_comment->cid);
     }
+    return true;
 }
 

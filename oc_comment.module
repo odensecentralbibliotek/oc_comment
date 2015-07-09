@@ -352,6 +352,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null,$
  */
 function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$current_level,$subject)
 {
+    oc_comments_user_check_validation(); // make sure user is logged in.
     global $language;
     global $user;
     if(isset($_GET['comment_body']) && strlen($_GET['comment_body']) > 0 && user_is_logged_in())
@@ -389,7 +390,6 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $comment->markup = render_single_comment_entity($obj,$current_level,true);
         cache_set('oc_comments_data',null,'cache');
         drupal_json_output($comment);
-        
     }
     drupal_exit();
 }
@@ -400,30 +400,35 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
 {
     oc_comments_user_check_validation(); // make sure user is logged in.
     $entity = reset(entity_load('comment',array($cid)));
-    
-    if($entity->comment_body[LANGUAGE_NONE][0]['value'] != $_GET['comment_body'])
+    global $user;
+    //only people with the propers rigths should be able to edit.
+    if(user_access('administer comments') ||  $entity->uid == $user->uid)
     {
-        $entity->comment_body[LANGUAGE_NONE][0]['value'] =  check_plain($_GET['comment_body']);
-        $entity_wrap = entity_metadata_wrapper('comment',  $entity);
-        if($entity_wrap->save())
+        if($entity->comment_body[LANGUAGE_NONE][0]['value'] != $_GET['comment_body'])
         {
-            cache_set('oc_comments_data',null,'cache');
-            drupal_json_output($entity);
-            drupal_exit();
+            $entity->comment_body[LANGUAGE_NONE][0]['value'] =  check_plain($_GET['comment_body']);
+            $entity_wrap = entity_metadata_wrapper('comment',  $entity);
+            if($entity_wrap->save())
+            {
+                cache_set('oc_comments_data',null,'cache');
+                drupal_json_output($entity);
+                drupal_exit();
+            }
+            else
+            {
+                echo "0";
+                drupal_exit();
+            }
         }
         else
         {
-            echo "0";
+            //Default to return the edit , so js is not broken.
+            //keep client side ligther.
+            drupal_json_output($entity);
             drupal_exit();
         }
     }
-    else
-    {
-        //Default to return the edit , so js is not broken.
-        //keep client side ligther.
-        drupal_json_output($entity);
-        drupal_exit();
-    }
+    drupal_exit();
 }
 /*
  * Delete Comment and if needed all its children.
@@ -431,19 +436,22 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
 function oc_comment_ajax_delete_submit_form($cid)
 {
      oc_comments_user_check_validation(); // make sure user is logged in.
-     global $user;
+
     /*
      * It always returns null. as the comment entity does not seem
      * to be compatible with the CRUD api. 
      * see: http://www.drupalcontrib.org/api/drupal/contributions!entity!entity.module/function/entity_delete_multiple/7
      */
-     
+     global $user;
      $node = node_load($cid);
      //make sure user has rigths to delete the comment ?
-     
-    oc_comment_recursive_delete($cid);
-    cache_set('oc_comments_data',null,'cache');
-    if(!$success)
+    $success = false;
+    if(user_access('administer comments') || $node->uid == $user->uid)
+    {
+        $success = oc_comment_recursive_delete($cid);
+        cache_set('oc_comments_data',null,'cache');
+    }
+    if($success)
     {
         cache_set('oc_comments_data',null,'cache');
         echo "1";
@@ -515,6 +523,5 @@ function oc_comment_views_pre_render(&$view) {
               $comment_data->comment_name = $user->data['display_name'];
             }
         }
-        
     }
 }
