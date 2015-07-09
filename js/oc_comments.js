@@ -16,6 +16,7 @@ function Init_buttons()
     bindDeleteajax();
     bindApproveajax();
     bind_readComments();
+    bind_comment_length_limit();
 }
 function toggle_spinner(selector, width, height, margin_left, margin_right)
 {
@@ -276,8 +277,6 @@ function bindDeleteajax()
     });
     //Dialog submit.
     jQuery(document.body).on('click', '#oc_comment_submit_delete_confirm_btn', function (e) {
-        
-
         //Get the current comment id being replied too.
         var comment_edit_id = Drupal.settings.oc_comment.selected_comment;
         //If id is -1 then we are creating a top-level comment.
@@ -321,10 +320,9 @@ function bindEditajax()
             formbox.fadeOut("slow");
             return false;
         }
- 
         jQuery.ajax({
             method: "GET",
-            url: "/oc/comments/ajax_form/edit"
+            url: "/oc/comments/ajax_form/edit/" + Drupal.settings.oc_comment.currentNid
         })
                 .done(function (msg) {
                     debugger;
@@ -340,6 +338,7 @@ function bindEditajax()
                     formbox.fadeIn("slow");
                     var tmp = jQuery('#edit_comment_message');
                     tmp.val(old_text);
+                    tmp.trigger('keyup');
 
                 });
         return false;
@@ -361,7 +360,7 @@ function bindEditajax()
                     //did we submit with success ?
                     var tmp = jQuery('#cid-' + comment_edit_id);
                     var tmp2 = tmp.find('.comment_content');
-                    tmp2.text(msg.comment_body.und[0].value);
+                    tmp2.text(msg.comment_body.und[0].value).wrap('<pre />');
 
                     var comment = tmp;
                     var formbox = comment.find('.oc-comment-form-box');
@@ -422,14 +421,14 @@ function reply_update_comment_count(cid)
     if(comment_button.length)
     {
         //replace existing
-        comment_button.text((comment_count) +' ' + Drupal.t('comments'));
+        comment_button.text((comment_count) +' ' + Drupal.t('comments')).wrap('<pre />');
     }
     else
     {
         //add New
         var elem = jQuery('<a></a>');
         elem.toggleClass('oc_comment_btn oc_comment_read_btn');
-        elem.text((comment_count) +' ' + Drupal.t('comments'));
+        elem.text((comment_count) +' ' + Drupal.t('comments')).wrap('<pre />');
         jQuery('cid-' + cid).find('.comment_toolbar').append(elem);
     }
     
@@ -450,5 +449,19 @@ function delete_update_comment_count(cid)
         var comment_count = input_comment_count.val() == undefined ? '0' : input_comment_count.val();
         comment_count =  parseInt(comment_count)-1; //we are adding one more comment..
         comment_button.text((comment_count) +' ' + Drupal.t('comments'));
+    }
+}
+function bind_comment_length_limit()
+{
+    if(Drupal.settings.oc_comment.reply_limit_active)
+    {
+        //Bind keypress handler to all future textbox inside comment wrapper
+        jQuery(document.body).on('keyup','textarea',function(){
+                //update the textbox's visual limit to reflect the chars left for
+                // the user to user.
+                var elem = jQuery(this);
+                    var charsleft = Drupal.settings.oc_comment.max_reply_length - elem.val().length;
+                    elem.parent().parent().parent().find('.oc_comment_word_limit').text(charsleft);
+                });
     }
 }

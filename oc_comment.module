@@ -148,7 +148,13 @@ function oc_comment_block_view($delta='') {
         $skip_approval = user_access('skip comment approval',$user) ? 1 : 0;
         $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
         $max_reply_level = variable_get('oc_comment_max_reply_level_'. $node->type, 0);
-        $setting = array('oc_comment' => array('currentNid' => $node->nid,'skip_approval' => $skip_approval));
+        $reply_limit_active = variable_get('oc_comment_reply_limit_active_'.$node->type, 0);
+        $max_reply_length = variable_get('oc_comment_max_reply_length'. $node->type, 250);
+        
+        $setting = array('oc_comment' => array('currentNid' => $node->nid
+                ,'skip_approval' => $skip_approval
+                ,'max_reply_length' => $max_reply_length,
+                'reply_limit_active' => $reply_limit_active));
        
         drupal_add_js($setting, 'setting');
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/oc_comments.js');
@@ -425,11 +431,16 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
 function oc_comment_ajax_delete_submit_form($cid)
 {
      oc_comments_user_check_validation(); // make sure user is logged in.
+     global $user;
     /*
      * It always returns null. as the comment entity does not seem
      * to be compatible with the CRUD api. 
      * see: http://www.drupalcontrib.org/api/drupal/contributions!entity!entity.module/function/entity_delete_multiple/7
      */
+     
+     $node = node_load($cid);
+     //make sure user has rigths to delete the comment ?
+     
     oc_comment_recursive_delete($cid);
     cache_set('oc_comments_data',null,'cache');
     if(!$success)

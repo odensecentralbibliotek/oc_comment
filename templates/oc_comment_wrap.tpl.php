@@ -6,9 +6,9 @@ echo "<div id='oc-comments-wrap'>";
      */
     if(!user_is_logged_in())
     {
-        $html .= "<div id='oc-comment-login-btn-wrap'>";
-        $html .= l(t('Login To Comment'),'',array('attributes' => array('class' => 'oc_comment_large_login_btn btn btn-info')));
-        $html .= "</div>";
+        echo "<div id='oc-comment-login-btn-wrap'>";
+        echo l(t('Login To Comment'),'',array('attributes' => array('class' => 'oc_comment_large_login_btn btn btn-info')));
+        echo "</div>";
     }
 echo $wrap_data;
 echo "</div>";

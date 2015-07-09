@@ -29,7 +29,7 @@ function oc_comment_comment_submit_form($form, &$form_state) {
         
     );
     $form['#action'] = "/oc/comments/ajax_form/reply/submit"; //the submit will be hijacked by javascript.
-
+   
     $form['submit_button'] = array(
         '#type' => 'button',
         '#attributes' => array(
@@ -39,6 +39,14 @@ function oc_comment_comment_submit_form($form, &$form_state) {
         '#id' => 'oc_comment_submit_form_btn',
         '#href' => "#",
     );
+    if(variable_get('oc_comment_reply_limit_active_'.$node->type, 0))
+    {
+        $form['char_limit'] = array(
+            '#markup' => '<p class="oc_comment_word_limit">250<p>',
+        );
+                //Force max length
+        $form['comment_message']['#attributes'] = array('maxlength' => variable_get('oc_comment_max_reply_length_'.$node->type, 250));
+    }
     return $form;
 }
 function oc_comment_comment_ajax_reply_form($form, &$form_state) {
@@ -85,14 +93,21 @@ function oc_comment_comment_ajax_reply_form($form, &$form_state) {
             'class' => array("oc_comment_btn"),
         )
     );
-
+    if(variable_get('oc_comment_reply_limit_active_'.$node->type, 0))
+    {
+        $form['char_limit'] = array(
+            '#markup' => '<p class="oc_comment_word_limit">250<p>',
+        );
+        $form['comment_message']['#attributes'] = array('maxlength' => variable_get('oc_comment_max_reply_length_'.$node->type, 250));
+    }
     return $form;
 }
 /*
  * 
  */
 function oc_comment_comment_ajax_edit_form($form, &$form_state) {
-    
+    $nid = $form_state['build_info']['args'][0];
+    $node = node_load($nid);
     if(variable_get('comment_subject_field_' . $form['#node_type']->type, 0))
     {
        $form['comment_subject'] = array(
@@ -131,13 +146,16 @@ function oc_comment_comment_ajax_edit_form($form, &$form_state) {
             'class' => array("oc_comment_btn"),
         )
     );
-
+    if(variable_get('oc_comment_reply_limit_active_'.$node->type, 0))
+    {
+        $form['char_limit'] = array(
+            '#markup' => '<p class="oc_comment_word_limit">250<p>',
+        );
+        //Force max length
+        $form['comment_message']['#attributes'] = array('maxlength' => variable_get('oc_comment_max_reply_length_'.$node->type, 250));
+    }
     return $form;
 }
-
-/*
- * 
- */
 function oc_comment_comment_ajax_delete_form($form, &$form_state) {
     $form['ok_button'] = array(
         '#type' => 'button',

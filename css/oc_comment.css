@@ -144,3 +144,12 @@ and open the template in the editor.
     cursor: pointer;
     width: 100%;
 }
+.oc_comment_word_limit
+{
+    padding: 10px;
+    color: black;
+    border-radius: 4px;
+    float: right;
+    margin-left: 3px;
+    margin-top: 5px;
+}

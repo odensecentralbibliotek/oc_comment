@@ -68,6 +68,13 @@ function oc_comment_form_node_type_form_alter(&$form, $form_state)
       '#title' => t('Hide comment children'),
       '#default_value' => variable_get('oc_hide_children_'.$form['#node_type']->type, 0),
       );
+    
+    $form['comment']['oc_comment_reply_limit_active'] = array(
+      '#type' => 'checkbox', 
+      '#title' => t('Activate comment limit'),
+      '#default_value' => variable_get('oc_comment_reply_limit_active_'.$form['#node_type']->type, 0),
+      );
+    
     $form['comment']['oc_comment_max_reply_level'] = array(
         '#type' => 'select',
         '#title' => t('Maximum reply level:'),
@@ -96,6 +103,7 @@ function oc_comment_form_node_type_form_alter(&$form, $form_state)
         ),
         '#required' => TRUE,
     );
+    
     /*
      * Sorting of children is normaly oldest first , so users the follow
      * the conversation , instead of scrolling to the bottom to get the
@@ -111,5 +119,16 @@ function oc_comment_form_node_type_form_alter(&$form, $form_state)
         ),
         '#required' => TRUE,
     );
+
+    if(variable_get('oc_comment_reply_limit_active_'.$form['#node_type']->type, 0))
+    {
+       $form['comment']['oc_comment_max_reply_length'] = array(
+        '#type' => 'textfield',
+        '#title' => t('max reply length:'),
+        '#default_value' => variable_get('oc_comment_max_reply_length_'.$form['#node_type']->type, 250),
+        '#size' => 25,
+        '#description' => t("The maximum length of the comments texts. Is usefull to force the user to keep to the escense"),
+        );
+    }
 
 }
