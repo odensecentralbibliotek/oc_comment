@@ -284,7 +284,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null,$
         //Is comment waiting approval ? add button.
         if($comment->status == 0 && in_array('administrator', $user->roles))
         {
-            $button_html .= l(t('Approve'),'',array('attributes' => array('class' => 'oc_comment_approve_btn oc_comment_btn',
+            $button_html .= l(t('publish'),'',array('attributes' => array('class' => 'oc_comment_approve_btn oc_comment_btn',
                 'id' => $comment->cid)));
         }
         //is own comment ?
@@ -386,8 +386,8 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $obj = new stdClass;
         $obj->parent = $comment;
         $obj->children = array();
-                
-        $comment->markup = render_single_comment_entity($obj,$current_level,true);
+        $is_child = $comment->pid == 0 ? false: true;
+        $comment->markup = render_single_comment_entity($obj,$current_level,$is_child );
         cache_set('oc_comments_data',null,'cache');
         drupal_json_output($comment);
     }

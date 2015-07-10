@@ -8,6 +8,16 @@ jQuery('document').ready(function () {
 });
 function Init_buttons()
 {
+    String.prototype.replaceAll = function(search, replace)
+{
+    //if replace is not sent, return original string otherwise it will
+    //replace search string with 'undefined'.
+    if (replace === undefined) {
+        return this.toString();
+    }
+
+    return this.replace(new RegExp('[' + search + ']', 'g'), replace);
+};
     //jQuery('body').off('click');
     bindLoginajax();
     bind_form_submit();
@@ -329,7 +339,8 @@ function bindEditajax()
                     jQuery('#oc-comment-comment-ajax-edit-form').remove();
                     //Show the Login in a dialog.
                     var tmp = e.currentTarget.getAttribute('id');
-                    var old_text = jQuery(e.currentTarget).parent().parent().find('.comment_content').text();
+                    var old_text = jQuery(e.currentTarget).parent().parent().find('.comment_content')
+                            .text().replaceAll('\n','\r\n\r\n');
                     Drupal.settings.oc_comment.selected_comment = tmp;
                     Drupal.settings.oc_comment.selected_comment_old_text = old_text;
                     var tmp = jQuery(msg);
@@ -337,9 +348,8 @@ function bindEditajax()
                     formbox.html(msg);
                     formbox.fadeIn("slow");
                     var tmp = jQuery('#edit_comment_message');
-                    tmp.val(old_text);
+                    tmp.html(old_text);
                     tmp.trigger('keyup');
-
                 });
         return false;
     });
@@ -360,8 +370,7 @@ function bindEditajax()
                     //did we submit with success ?
                     var tmp = jQuery('#cid-' + comment_edit_id);
                     var tmp2 = tmp.find('.comment_content');
-                    tmp2.text(msg.comment_body.und[0].value).wrap('<pre />');
-
+                    tmp2.text(msg.comment_body.und[0].value);
                     var comment = tmp;
                     var formbox = comment.find('.oc-comment-form-box');
                     formbox.fadeOut("slow");

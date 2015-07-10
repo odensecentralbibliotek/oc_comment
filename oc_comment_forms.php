@@ -5,9 +5,12 @@
 function oc_comment_comment_submit_form($form, &$form_state) {
     $nid = $form_state['build_info']['args'][0];
     $node = node_load($nid);
+    $form['Headline'] = array(
+       '#markup' => '<h2>'.t('Write comment').'</h2>',
+    );
     $form['my_markup'] = array(
-    '#markup' => '<div class="submit-form-error-message"></div>'
-  );
+        '#markup' => '<div class="submit-form-error-message"></div>'
+    );
     if(variable_get('comment_subject_field_' . $node->type, 0))
     {
        $form['comment_subject'] = array(
@@ -42,7 +45,7 @@ function oc_comment_comment_submit_form($form, &$form_state) {
     if(variable_get('oc_comment_reply_limit_active_'.$node->type, 0))
     {
         $form['char_limit'] = array(
-            '#markup' => '<p class="oc_comment_word_limit">250<p>',
+            '#markup' => '<p class="oc_comment_word_limit">'.variable_get('oc_comment_max_reply_length_'.$node->type, 0).'<p>',
         );
                 //Force max length
         $form['comment_message']['#attributes'] = array('maxlength' => variable_get('oc_comment_max_reply_length_'.$node->type, 250));
@@ -96,7 +99,7 @@ function oc_comment_comment_ajax_reply_form($form, &$form_state) {
     if(variable_get('oc_comment_reply_limit_active_'.$node->type, 0))
     {
         $form['char_limit'] = array(
-            '#markup' => '<p class="oc_comment_word_limit">250<p>',
+            '#markup' => '<p class="oc_comment_word_limit">'.variable_get('oc_comment_max_reply_length_'.$node->type, 0).'<p>',
         );
         $form['comment_message']['#attributes'] = array('maxlength' => variable_get('oc_comment_max_reply_length_'.$node->type, 250));
     }
@@ -108,6 +111,7 @@ function oc_comment_comment_ajax_reply_form($form, &$form_state) {
 function oc_comment_comment_ajax_edit_form($form, &$form_state) {
     $nid = $form_state['build_info']['args'][0];
     $node = node_load($nid);
+
     if(variable_get('comment_subject_field_' . $form['#node_type']->type, 0))
     {
        $form['comment_subject'] = array(
@@ -124,7 +128,7 @@ function oc_comment_comment_ajax_edit_form($form, &$form_state) {
         '#size' => 50,
         '#required' => TRUE, //make this field required
         '#name' => 'edit_comment_message',
-        '#id' => 'edit_comment_message'
+        '#id' => 'edit_comment_message',
     );
     $form['#action'] = "/oc/comments/ajax_form/reply/edit"; //the submit will be hijacked by javascript.
 
@@ -149,7 +153,7 @@ function oc_comment_comment_ajax_edit_form($form, &$form_state) {
     if(variable_get('oc_comment_reply_limit_active_'.$node->type, 0))
     {
         $form['char_limit'] = array(
-            '#markup' => '<p class="oc_comment_word_limit">250<p>',
+            '#markup' => '<p class="oc_comment_word_limit">'.variable_get('oc_comment_max_reply_length_'.$node->type, 0).'<p>',
         );
         //Force max length
         $form['comment_message']['#attributes'] = array('maxlength' => variable_get('oc_comment_max_reply_length_'.$node->type, 250));
