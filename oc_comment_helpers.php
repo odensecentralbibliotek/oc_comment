@@ -88,12 +88,17 @@ function render_single_comment_entity($entity, $current_level, $is_child = false
     
     return theme('oc_comment_item',array('entity' => $entity,'current_level' => $current_level,'is_child' => $is_child));
 }
-
+/*
+ * 
+ */
 function oc_comments_user_check_validation($msg = null, $required_role = null) {
     if (!user_is_logged_in()) {
         drupal_exit();
     }
 }
+/*
+ * 
+ */
 function oc_comment_recursive_delete($cid)
 {
     //are just starting ?

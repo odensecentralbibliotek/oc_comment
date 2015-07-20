@@ -46,6 +46,11 @@ function oc_comment_config_form() {
             ),
         ),
     );
+    $form['oc_comment_rules_link'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Kommentar skrivnings regler:'),
+        '#default_value' => variable_get('oc_comment_rules_link',null),
+    );
     return system_settings_form($form);
 }
 function oc_comment_form_node_type_form_alter(&$form, $form_state)
@@ -58,7 +63,7 @@ function oc_comment_form_node_type_form_alter(&$form, $form_state)
      * Normal settings woult be 1 or 2.
      */
     hide($form['comment']['comment_form_location']);
-    hide($form['comment']['comment_preview']);
+    //hide($form['comment']['comment_preview']);
     hide($form['comment']['comment_default_mode']);
     /*
      * Should the children always be expanded ?
@@ -131,4 +136,23 @@ function oc_comment_form_node_type_form_alter(&$form, $form_state)
         );
     }
 
+}
+/*
+ * Hook to make ding users real name appear i admin comment manager.
+ */
+function oc_comment_views_pre_render(&$view) {
+    if($view->name == "admin_views_comment")
+    {
+        foreach($view->result as $index => $comment_data)
+        {
+            //is it a ding user ? without a proper name.
+        
+            //load the user
+            $user = user_load($comment_data->_field_data['cid']['entity']->uid);
+            if(isset($user->data['display_name']))
+            {
+              $comment_data->comment_name = $user->data['display_name'];
+            }
+        }
+    }
 }

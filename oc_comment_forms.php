@@ -32,7 +32,15 @@ function oc_comment_comment_submit_form($form, &$form_state) {
         
     );
     $form['#action'] = "/oc/comments/ajax_form/reply/submit"; //the submit will be hijacked by javascript.
-   
+    
+    $rulesLink = variable_get('oc_comment_rules_link',null);
+    if($rulesLink != null)
+    {
+        $form['terms_of_usage'] = array(
+            '#markup' => "<a href='{$rulesLink}' target='_blank' class='oc-comments-terms-links'>".t('se vores regler')."</a>"
+        );
+    }
+
     $form['submit_button'] = array(
         '#type' => 'button',
         '#attributes' => array(
@@ -52,6 +60,9 @@ function oc_comment_comment_submit_form($form, &$form_state) {
     }
     return $form;
 }
+/*
+ * 
+ */
 function oc_comment_comment_ajax_reply_form($form, &$form_state) {
     $nid = $form_state['build_info']['args'][0];
     $node = node_load($nid);
@@ -77,7 +88,9 @@ function oc_comment_comment_ajax_reply_form($form, &$form_state) {
         
     );
     $form['#action'] = "/oc/comments/ajax_form/reply/submit"; //the submit will be hijacked by javascript.
-
+    $form['my_markup'] = array(
+        '#markup' => '<a class="oc-comments-terms-links">se vores regler</a>'
+    );
     $form['submit_button'] = array(
         '#type' => 'button',
         '#attributes' => array(
@@ -160,6 +173,9 @@ function oc_comment_comment_ajax_edit_form($form, &$form_state) {
     }
     return $form;
 }
+/*
+ * 
+ */
 function oc_comment_comment_ajax_delete_form($form, &$form_state) {
     $form['ok_button'] = array(
         '#type' => 'button',
@@ -181,7 +197,6 @@ function oc_comment_comment_ajax_delete_form($form, &$form_state) {
 /*
  * ajax based form loading.
  */
-
 function oc_comment_ajax_login_form() {
     $form = drupal_get_form('user_login');
     $tmp = parse_url($_SERVER['HTTP_REFERER']);
@@ -190,7 +205,9 @@ function oc_comment_ajax_login_form() {
     // Halt page processing
     drupal_exit();
 }
-
+/*
+ * 
+ */
 function oc_comment_ajax_reply_form($nid) {
     /*
      * Pass the current nid , so we can figure out if we need to include subject.
@@ -199,13 +216,17 @@ function oc_comment_ajax_reply_form($nid) {
     echo render($form);
     drupal_exit();
 }
-
+/*
+ * 
+ */
 function oc_comment_ajax_edit_form($nid) {
     $form = drupal_get_form('oc_comment_comment_ajax_edit_form',$nid);
     echo render($form);
     drupal_exit();
 }
-
+/*
+ * 
+ */
 function oc_comment_ajax_delete_form($nid) {
     $form = drupal_get_form('oc_comment_comment_ajax_delete_form');
     echo render($form);

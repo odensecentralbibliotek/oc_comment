@@ -149,8 +149,11 @@ function oc_comment_block_view($delta='') {
         $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
         $max_reply_level = variable_get('oc_comment_max_reply_level_'. $node->type, 0);
         $reply_limit_active = variable_get('oc_comment_reply_limit_active_'.$node->type, 0);
-        $max_reply_length = variable_get('oc_comment_max_reply_length'. $node->type, 250);
+        $max_reply_length = variable_get('oc_comment_max_reply_length_'. $node->type, 250);
         
+        /*
+         * Setup settings and include  the front-end javascript.
+         */
         $setting = array('oc_comment' => array('currentNid' => $node->nid
                 ,'skip_approval' => $skip_approval
                 ,'max_reply_length' => $max_reply_length,
@@ -161,11 +164,18 @@ function oc_comment_block_view($delta='') {
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/jquery.pulsate.js');
         drupal_add_css(drupal_get_path('module', 'oc_comment') . '/css/oc_comment.css');
         
+        /*
+         * Display a block.
+         */
         $block = array();
         switch($delta) {
           case 'oc_comments_block' :
           {
-           $Comments_render_arrary = &drupal_static(__FUNCTION__);
+            /*
+             * Fetch all the comments and create the render data.
+             * caching is used for faster turns.
+             */
+            $Comments_render_arrary = &drupal_static(__FUNCTION__);
             if (!isset($oc_comments_data)) { 
                 $cache = cache_get('oc_comments_data');
                 if (isset($cache->data) && is_array($cache->data)) {
@@ -181,6 +191,9 @@ function oc_comment_block_view($delta='') {
             {
                 $block['content'] = $oc_comments_data;
             }
+            /*
+             * Render the comment data array.
+             */
             $block['content'] = GenerateHtmlContent($Comments_render_arrary,$node);
             break;
           }
@@ -197,6 +210,9 @@ function oc_comment_block_view($delta='') {
               break;
           }
         }
+        /*
+         * Custom check to see if we are being called from ajax.
+         */
         if($ajax ==  1)
         {
             drupal_json_output($block);
@@ -215,7 +231,6 @@ function oc_comment_block_view($delta='') {
  */
 function GenerateHtmlContent($comments,$node)
 {
-    //$per_page = variable_get('oc_comment_pr_page' , 5);
     global $user;
     $level = 1;    
     $per_page = variable_get('comment_default_per_page_' . $node->type, 50);
@@ -348,11 +363,12 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null,$
     return $button_html;
 }
 /*
- * Handles creating new comments.
+ * Handles creating new comments via ajax call.
  */
 function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$current_level,$subject)
 {
     oc_comments_user_check_validation(); // make sure user is logged in.
+    
     global $language;
     global $user;
     if(isset($_GET['comment_body']) && strlen($_GET['comment_body']) > 0 && user_is_logged_in())
@@ -364,12 +380,12 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $comment->uid = $user->uid; // user's id, who left the comment
         $comment->mail = $user->mail; // user's email
         $comment->name = $user->name; // If user is authenticated you can omit this field, it will be auto-populated, if the user is anonymous and you want to name him somehow, input his name here
-        //$comment->thread = '01/'; // OPTIONAL. If you need comments to be threaded you can fill this value. Otherwise omit it.
-        //$comment->hostname = '127.0.01' // OPTIONAL. You can log poster's ip here
+        //$comment->thread = '01/'; // This might be interesting to add emulator on a later time.. but beyond scope of project.
+        //$comment->hostname = '127.0.01' // Happens automaticly deeper in core comment module.
         $comment->created = time(); // OPTIONAL. You can set any time you want here. Useful for backdated comments creation.
-        $comment->is_anonymous = 0; // leave it as is
+        $comment->is_anonymous = 0; // OC_comments dont allow anon comments at this time.
         $comment->homepage = ''; // you can add homepage URL here
-        $comment->status = user_access('skip comment approval') ? COMMENT_PUBLISHED : COMMENT_NOT_PUBLISHED; // We auto-publish this comment
+        $comment->status = user_access('skip comment approval') ? COMMENT_PUBLISHED : COMMENT_NOT_PUBLISHED; // We auto-publish this comment if permissions apply
         $comment->language = LANGUAGE_NONE; // The same as for a node
         $comment->subject = $_GET['subject'] == 'undefined' ? t('No subject') : $_GET['subject']; 
         $comment->node_type = 'comment_node_ding_news';
@@ -378,8 +394,12 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $entity = entity_create('comment', (array)$comment);
         $entity = entity_metadata_wrapper('comment',  $entity);
         $entity->save();
-        //get the saved comments id.
+        
+        /*
+         * Get the saved comments id.
+         */
         $comment->cid = $entity->getIdentifier();
+        
         /*
          * Hack so we can use 1 function to render...
          */
@@ -394,7 +414,7 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
     drupal_exit();
 }
 /*
- * Handles editing comment.
+ * Handles editing comment from ajax.
  */
 function oc_comment_ajax_edit_submit_form($cid,$comment_body)
 {
@@ -462,6 +482,9 @@ function oc_comment_ajax_delete_submit_form($cid)
     }
     drupal_exit();
 }
+/*
+ * Ajax method for approving a comment.
+ */
 function oc_comment_ajax_approve_comment($cid)
 {
     oc_comments_user_check_validation(); // make sure user is logged in.
@@ -480,6 +503,9 @@ function oc_comment_ajax_approve_comment($cid)
         echo "0";
     }
 }
+/*
+ * Register templates.
+ */
 function oc_comment_theme($existing, $type, $theme, $path) {
     return array(
     'oc_comment_item' => array(
@@ -493,6 +519,9 @@ function oc_comment_theme($existing, $type, $theme, $path) {
         'arguments' => array('wrap_data' => null),
     ));
 }
+/*
+ * Change drupal core comments display
+ */
 function oc_comment_form_comment_form_alter(&$form,$form_state)
 {
     hide($form['author']);   
@@ -507,21 +536,5 @@ function oc_comment_node_view_alter(&$build)
     if(isset($build['links']['comment']))
     {
        hide($build['links']['comment']);
-    }
-}
-function oc_comment_views_pre_render(&$view) {
-    if($view->name == "admin_views_comment")
-    {
-        foreach($view->result as $index => $comment_data)
-        {
-            //is it a ding user ? without a proper name.
-        
-            //load the user
-            $user = user_load($comment_data->_field_data['cid']['entity']->uid);
-            if(isset($user->data['display_name']))
-            {
-              $comment_data->comment_name = $user->data['display_name'];
-            }
-        }
     }
 }

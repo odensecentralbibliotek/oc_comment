@@ -31,6 +31,7 @@ and open the template in the editor.
     float: right;
     width: 25px;
     height: 25px;
+    margin-right:5px;
 }
 .oc_comment_parent
 {
@@ -40,6 +41,7 @@ and open the template in the editor.
 {
     margin:4px;
     padding-left: 15px;
+    margin-left: 25px;
     width: 75% !important;
 }
 .comment-new {
@@ -171,4 +173,14 @@ and open the template in the editor.
 {
     float: left;
     width: 99%;
+}
+.oc-comments-terms-links
+{
+    padding: 5px;
+    color: black;
+    border-radius: 4px;
+    float: right;
+    margin-left: 3px;
+    margin-top: 5px;
+    font-size: 17px;
 }

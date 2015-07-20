@@ -32,7 +32,7 @@
     $html.= "<input type='hidden' id='comment_level' value='" . $current_level . "' />\n";
     $html.= "<input type='hidden' id='comment_id' value='" . $entity->parent->cid . "' />\n";
     $html.= "<input type='hidden' id='comment_count' value='" . sizeof($entity->children) . "' />\n";
-    $html.= "<div class='submitted'><b>" . $full_name . " - " . date("d-m-Y H:i", $entity->parent->created) . "</b></div>\n";
+    $html.= "<div class='submitted'><b>" . $full_name . "</b> - " . date("d-m-Y H:i", $entity->parent->created) . "</div>\n";
     $html.= "<div class='comment_content'>";
     if(variable_get('comment_subject_field_' . $node->type, 0))
     {
