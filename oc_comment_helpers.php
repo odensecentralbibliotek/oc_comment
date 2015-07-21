@@ -93,8 +93,9 @@ function render_single_comment_entity($entity, $current_level, $is_child = false
  */
 function oc_comments_user_check_validation($msg = null, $required_role = null) {
     if (!user_is_logged_in()) {
-        drupal_exit();
+        return false;
     }
+    return true;
 }
 /*
  * 

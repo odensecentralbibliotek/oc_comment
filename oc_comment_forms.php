@@ -88,9 +88,13 @@ function oc_comment_comment_ajax_reply_form($form, &$form_state) {
         
     );
     $form['#action'] = "/oc/comments/ajax_form/reply/submit"; //the submit will be hijacked by javascript.
-    $form['my_markup'] = array(
-        '#markup' => '<a class="oc-comments-terms-links">se vores regler</a>'
-    );
+    $rulesLink = variable_get('oc_comment_rules_link',null);
+    if($rulesLink != null)
+    {
+        $form['terms_of_usage'] = array(
+            '#markup' => "<a href='{$rulesLink}' target='_blank' class='oc-comments-terms-links'>".t('se vores regler')."</a>"
+        );
+    }
     $form['submit_button'] = array(
         '#type' => 'button',
         '#attributes' => array(
@@ -144,7 +148,15 @@ function oc_comment_comment_ajax_edit_form($form, &$form_state) {
         '#id' => 'edit_comment_message',
     );
     $form['#action'] = "/oc/comments/ajax_form/reply/edit"; //the submit will be hijacked by javascript.
-
+    
+    $rulesLink = variable_get('oc_comment_rules_link',null);
+    if($rulesLink != null)
+    {
+        $form['terms_of_usage'] = array(
+            '#markup' => "<a href='{$rulesLink}' target='_blank' class='oc-comments-terms-links'>".t('se vores regler')."</a>"
+        );
+    }
+    
     $form['submit_button'] = array(
         '#type' => 'button',
         '#value' => t('Send'),

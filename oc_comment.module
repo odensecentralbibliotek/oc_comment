@@ -20,14 +20,14 @@ function oc_comment_menu() {
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
-    
+   /* 
   $items['oc/comments/save/ajax/%'] = array(
     'page callback' => 'oc_comment_callback', // Render HTML
     'description' => '',
     'page arguments' => array(4),
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
-   );
+   );*/
   
     $items['oc/comments/ajax_form/login'] = array(
     'page callback' => 'oc_comment_ajax_login_form', // Render HTML
@@ -40,7 +40,7 @@ function oc_comment_menu() {
     'page callback' => 'oc_comment_ajax_reply_form', // Render HTML
     'description' => 'Renders comment reply form for ajax.',
     'type' => MENU_CALLBACK,
-    'access arguments' => array('access content'),
+    'access callback' => 'oc_comments_user_check_validation'
    );
   
   $items['oc/comments/ajax_form/reply/submit/%/%/%/%'] = array(
@@ -49,14 +49,14 @@ function oc_comment_menu() {
     'page arguments' => array(5,6,7,8,9),
     'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
-    'access arguments' => array('access content'),
+    'access callback' => 'oc_comments_user_check_validation'
    );
   
     $items['oc/comments/ajax_form/edit'] = array(
     'page callback' => 'oc_comment_ajax_edit_form', // Render HTML
     'description' => 'opens comment edit ajax popup.',
     'type' => MENU_CALLBACK,
-    'access arguments' => array('access content'),
+    'access callback' => 'oc_comments_user_check_validation'
    );
     
   $items['oc/comments/ajax_form/edit/submit/%/%'] = array(
@@ -65,7 +65,7 @@ function oc_comment_menu() {
     'page arguments' => array(5,6),
     'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
-    'access arguments' => array('access content'),
+    'access callback' => 'oc_comments_user_check_validation'
    );
   
     $items['oc/comments/ajax_form/delete/submit/%'] = array(
@@ -73,14 +73,14 @@ function oc_comment_menu() {
     'description' => 'deletes comment',
     'page arguments' => array(5),
     'type' => MENU_CALLBACK,
-    'access arguments' => array('access content'),
+    'access callback' => 'oc_comments_user_check_validation'
    );
     
    $items['oc/comments/ajax_form/delete'] = array(
     'page callback' => 'oc_comment_ajax_delete_form', // Render HTML
     'description' => 'deletes comment popup confirm',
     'type' => MENU_CALLBACK,
-    'access arguments' => array('access content'),
+    'access callback' => 'oc_comments_user_check_validation'
    );
    
    $items['oc/comments/ajax/approve/%'] = array(
@@ -88,7 +88,7 @@ function oc_comment_menu() {
     'description' => 'Approves comments',
     'page arguments' => array(4),
     'type' => MENU_CALLBACK,
-    'access arguments' => array('access content'),
+    'access callback' => 'oc_comments_user_check_validation'
    );
   return $items;
 }
@@ -366,9 +366,7 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null,$
  * Handles creating new comments via ajax call.
  */
 function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$current_level,$subject)
-{
-    oc_comments_user_check_validation(); // make sure user is logged in.
-    
+{    
     global $language;
     global $user;
     if(isset($_GET['comment_body']) && strlen($_GET['comment_body']) > 0 && user_is_logged_in())
@@ -418,7 +416,6 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
  */
 function oc_comment_ajax_edit_submit_form($cid,$comment_body)
 {
-    oc_comments_user_check_validation(); // make sure user is logged in.
     $entity = reset(entity_load('comment',array($cid)));
     global $user;
     //only people with the propers rigths should be able to edit.
@@ -455,8 +452,6 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
  */
 function oc_comment_ajax_delete_submit_form($cid)
 {
-     oc_comments_user_check_validation(); // make sure user is logged in.
-
     /*
      * It always returns null. as the comment entity does not seem
      * to be compatible with the CRUD api. 
@@ -487,7 +482,6 @@ function oc_comment_ajax_delete_submit_form($cid)
  */
 function oc_comment_ajax_approve_comment($cid)
 {
-    oc_comments_user_check_validation(); // make sure user is logged in.
     $entity = reset(entity_load('comment',array($cid)));
     $entity_wrap = entity_metadata_wrapper('comment',  $entity);
     $entity_wrap->status = 1;
