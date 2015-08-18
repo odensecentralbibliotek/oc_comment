@@ -241,6 +241,7 @@ function GenerateHtmlContent($comments,$node)
     $chunks = array_chunk($comments, $per_page, TRUE);
     $html = "";
     $current_url = request_path();
+    
     /*
      * pager_default_initialize gets wrong page number if we reference a comment
      * directly via url alias.
@@ -253,25 +254,28 @@ function GenerateHtmlContent($comments,$node)
             $Target_comment = $Target_comment[1];
             foreach($chunks as $page => $nodes)
             {
-                $found = false;
-                foreach($nodes as $nid => $node)
-                {
-                    if($nid == $Target_comment)
-                    {
-                        $found = true;
-                        break;
-                    }
-                }
-                if($found == true)
+                if(contains_comment_id($nodes,$Target_comment))
                 {
                     $current_page = $page;
                     $_GET['page'] = $page; //hack! :)
+                    $disable_comment_folding_temp = true;
                     break;
                 }
             }
         }
   
     }
+    /*
+     * Disable comment child folding when viewing a specifik comment.
+     * this makes sense when we want to view a certain comment.
+     */
+    $old_child_fold_setting = 0;
+    if($disable_comment_folding_temp)
+    {
+        $old_child_fold_setting = variable_get('oc_hide_children_'. $node->type,0);
+        variable_set('oc_hide_children_'. $node->type,0);
+    }
+    
     $current_page = pager_default_initialize(count($comments), $per_page);
     foreach($chunks[$current_page] as $index => $comment)
     {
@@ -283,7 +287,12 @@ function GenerateHtmlContent($comments,$node)
     }
     $html .= theme('pager', array('quantity',count($comments)));
     $html = theme('oc_comment_wrap',array('wrap_data' => $html));
-
+    
+    //restore setting when viewing normaly.
+    if($disable_comment_folding_temp)
+    {
+        variable_set('oc_hide_children_'. $node->type,$old_child_fold_setting);
+    }
     return $html;
 }
 /*

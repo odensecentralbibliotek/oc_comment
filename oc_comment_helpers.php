@@ -127,4 +127,22 @@ function oc_comment_recursive_delete($cid)
     }
     return true;
 }
+function contains_comment_id($comments,$cid)
+{
+    foreach($comments as $index => $obj)
+    {
+        if($obj->parent->cid == $cid)
+        {
+            return true;
+        }
+        else
+        {
+            $return = contains_comment_id($obj->children,$cid);
+            if($return == true)
+            {
+                return $return;
+            }
+        }
+    }
+}
 
