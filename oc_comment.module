@@ -232,12 +232,47 @@ function oc_comment_block_view($delta='') {
 function GenerateHtmlContent($comments,$node)
 {
     global $user;
+    $disable_comment_folding_temp = false;
     $level = 1;    
     $per_page = variable_get('comment_default_per_page_' . $node->type, 50);
-    $current_page = pager_default_initialize(count($comments), $per_page);
+    
+    
     // Split your list into page sized chunks
     $chunks = array_chunk($comments, $per_page, TRUE);
     $html = "";
+    $current_url = request_path();
+    /*
+     * pager_default_initialize gets wrong page number if we reference a comment
+     * directly via url alias.
+     */
+    if(strpos($current_url, 'comment/') !== FALSE)
+    {
+        $Target_comment = explode('/',$current_url); //get the referenced comment.
+        if(sizeof($Target_comment) >= 1)
+        {
+            $Target_comment = $Target_comment[1];
+            foreach($chunks as $page => $nodes)
+            {
+                $found = false;
+                foreach($nodes as $nid => $node)
+                {
+                    if($nid == $Target_comment)
+                    {
+                        $found = true;
+                        break;
+                    }
+                }
+                if($found == true)
+                {
+                    $current_page = $page;
+                    $_GET['page'] = $page; //hack! :)
+                    break;
+                }
+            }
+        }
+  
+    }
+    $current_page = pager_default_initialize(count($comments), $per_page);
     foreach($chunks[$current_page] as $index => $comment)
     {
         if($comment->parent->status == 1 || in_array('administrator', $user->roles) || $comment->parent->uid == $user->uid)
@@ -511,7 +546,13 @@ function oc_comment_theme($existing, $type, $theme, $path) {
         'path' => $path . '/templates',
         'template' => 'oc_comment_wrap',
         'arguments' => array('wrap_data' => null),
-    ));
+    ),
+    'oc_comment_new_comment_email' => array(
+        'path' => $path . '/templates',
+        'template' => 'oc-comment-email_new_comment',
+        'arguments' => array('email_data' => null),
+    )
+        );
 }
 /*
  * Change drupal core comments display
@@ -521,10 +562,16 @@ function oc_comment_form_comment_form_alter(&$form,$form_state)
     hide($form['author']);   
     $form['comment_body']['und'][0]['value']['#title_display'] = 'invisible';
 }
+/*
+ * Alter drupal core comments display.
+ */
 function oc_comment_form_ding_user_comment_forbidden_form_alter(&$form,$form_state)
 {
     hide($form['submit']);
 }
+/*
+ * Alter drupal core comments display.
+ */
 function oc_comment_node_view_alter(&$build)
 {
     if(isset($build['links']['comment']))

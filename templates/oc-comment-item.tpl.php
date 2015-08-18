@@ -20,7 +20,7 @@
     $wrap_classes[] = $entity->parent->status == 0 ? 'oc-comment-approval-required' : 'oc-comment-approved';
     $wrap_classes[] = ($is_child == true ? 'oc_comment_child' : 'oc_comment_parent');
 
-    $html.= "<div id='cid-" . $entity->parent->cid . "' class='" . implode(' ', $wrap_classes) . "'>";
+    $html.= "<div name='comment-{$entity->parent->cid}' id='comment-" . $entity->parent->cid . "' class='" . implode(' ', $wrap_classes) . "'>";
     foreach ($comment_user->roles as $roles) {
         if (in_array($roles, $site_admin_roles)) {
             $logo_img = variable_get('oc_comment_file_path', 'https://odensebib.dk/sites/www.odensebib.dk/files/logo.png');

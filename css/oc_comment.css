@@ -7,6 +7,7 @@ and open the template in the editor.
     Created on : 19-05-2015, 09:07:56
     Author     : tfpet
 */
+
 #oc-comments-wrap
 {
     min-width: 100%;
@@ -17,7 +18,7 @@ and open the template in the editor.
 }
 .comment {
     border-bottom: 1px dashed lightgray;
-    border-radius: 10px;
+    /*border-radius: 10px*/;
     border-top-left-radius: 0px;
     margin: 10px;
     padding: 5px;
@@ -41,8 +42,8 @@ and open the template in the editor.
 {
     margin:4px;
     padding-left: 15px;
-    margin-left: 25px;
-    width: 75% !important;
+    margin-left: 15px;
+    width: 90% !important;
 }
 .comment-new {
     background: aliceblue;
@@ -149,8 +150,8 @@ and open the template in the editor.
 {
     padding-top: 5px;
     font-size: 17px;
-    white-space: pre;
-    line-height:100%;
+    /*white-space: pre*/;
+    line-height:115%;
    
 }
 .oc_comments_reply_bar

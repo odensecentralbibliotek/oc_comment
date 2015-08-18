@@ -59,12 +59,11 @@ function bind_form_submit()
         })
                 .done(function (msg) {
                     //insert the created comment.
-                    jQuery('#oc-comments-wrap').prepend(msg.markup);
+                    
                     if(Drupal.settings.oc_comment.skip_approval)
                     {
                         jQuery(".submit-form-error-message").append('<div class="messages status">Comment Postet</div>');
-                     
-     
+                        jQuery('#oc-comments-wrap').prepend(msg.markup);
                     }
                     else
                     {
@@ -193,7 +192,7 @@ function bindReplyajax()
                 .done(function (msg) {
                     debugger;
                     //did we submit with success ?
-                    var comment = jQuery('#cid-' + Drupal.settings.oc_comment.selected_comment);
+                    var comment = jQuery('#comment-' + Drupal.settings.oc_comment.selected_comment);
                     reply_update_comment_count( Drupal.settings.oc_comment.selected_comment);
                     var formbox = comment.find('.oc-comment-form-box');
                     formbox.fadeOut("slow");
@@ -206,7 +205,7 @@ function InsertCommentReply(comment)
 {
         var pid = comment.pid;
         var cid = comment.cid;
-        var elem = jQuery('#cid-' + pid);
+        var elem = jQuery('#comment-' + pid);
         var sibling = elem.next();
         debugger;
         //check if there are existing comments.
@@ -299,7 +298,7 @@ function bindDeleteajax()
                     //did we submit with success ?
                     jQuery('#oc-comment-comment-ajax-delete-form').dialog('close');
                     delete_update_comment_count(Drupal.settings.oc_comment.selected_comment);
-                    var comment = jQuery('#cid-' + Drupal.settings.oc_comment.selected_comment);
+                    var comment = jQuery('#comment-' + Drupal.settings.oc_comment.selected_comment);
                     var formbox = comment.find('.oc-comment-form-box');
                     formbox.fadeOut("slow");
                     //If success inject the new comment @ correct place.
@@ -368,7 +367,7 @@ function bindEditajax()
         })
                 .done(function (msg) {
                     //did we submit with success ?
-                    var tmp = jQuery('#cid-' + comment_edit_id);
+                    var tmp = jQuery('#comment-' + comment_edit_id);
                     var tmp2 = tmp.find('.comment_content');
                     tmp2.text(msg.comment_body.und[0].value);
                     var comment = tmp;
@@ -392,8 +391,8 @@ function bindApproveajax()
             //hide button and somehow show success
             var replybtn = jQuery('<a href="/" class="oc_comment_reply_btn oc_comment_btn">Reply</a>');
             replybtn.prop('id', cid);
-            jQuery('#cid-' + cid).find('.oc_comment_approve_btn').replaceWith(replybtn);
-            jQuery('#cid-' + cid).css('background-color', 'white');
+            jQuery('#comment-' + cid).find('.oc_comment_approve_btn').replaceWith(replybtn);
+            jQuery('#comment-' + cid).css('background-color', 'white');
             reply_update_comment_count(cid);
         });
         //start approving.
@@ -421,10 +420,10 @@ function getUrlParameter(url, sParam)
 function reply_update_comment_count(cid)
 {
     //Check if current comment already has a read comment button.
-    var comment_button = jQuery('#cid-' + cid).find('.oc_comment_read_btn');
+    var comment_button = jQuery('#comment-' + cid).find('.oc_comment_read_btn');
     
     //Extract the current count
-    var input_comment_count = jQuery('#cid-' + cid).find('#comment_count');
+    var input_comment_count = jQuery('#comment-' + cid).find('#comment_count');
     var comment_count = input_comment_count.val() == undefined ? '0' : input_comment_count.val();
     comment_count =  parseInt(comment_count)+1; //we are adding one more comment..
     if(comment_button.length)
@@ -446,15 +445,15 @@ function reply_update_comment_count(cid)
 function delete_update_comment_count(cid)
 {
     //does comment have a parent ?
-    var comment_level = jQuery('#cid-' + cid).find('#comment_level').val();
+    var comment_level = jQuery('#comment-' + cid).find('#comment_level').val();
     
     //if yes then we decrease comment count.
     if(comment_level != 0)
     {
-        var comment_parent_id = jQuery('#cid-' + cid).find('#comment_parent').val();
-        var comment_button = jQuery('#cid-' + comment_parent_id).find('.oc_comment_read_btn');
+        var comment_parent_id = jQuery('#comment-' + cid).find('#comment_parent').val();
+        var comment_button = jQuery('#comment-' + comment_parent_id).find('.oc_comment_read_btn');
         
-        var input_comment_count = jQuery('#cid-' + comment_parent_id).find('#comment_count');
+        var input_comment_count = jQuery('#comment-' + comment_parent_id).find('#comment_count');
         var comment_count = input_comment_count.val() == undefined ? '0' : input_comment_count.val();
         comment_count =  parseInt(comment_count)-1; //we are adding one more comment..
         comment_button.text((comment_count) +' ' + Drupal.t('comments'));
