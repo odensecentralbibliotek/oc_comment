@@ -61,7 +61,6 @@ function oc_comments_build_comment_array($node) {
 /*
  * Retrive the body of the given comment from the related field table.
  */
-
 function oc_comment_get_comment_body($cid) {
     if (!isset($cid) || $cid == '') {
         return "";
@@ -72,11 +71,11 @@ function oc_comment_get_comment_body($cid) {
     $value = $entity->comment_body->value();
     if(is_array($value))
     {
-        return check_markup($value['value']);
+        return decode_entities(check_plain($value['value']));
     }
     else
     {
-      return check_markup($value);
+      return decode_entities(check_plain($value));
     }
 }
 
@@ -98,7 +97,7 @@ function oc_comments_user_check_validation($msg = null, $required_role = null) {
     return true;
 }
 /*
- * 
+ * deletes comment and all its children
  */
 function oc_comment_recursive_delete($cid)
 {
@@ -127,6 +126,9 @@ function oc_comment_recursive_delete($cid)
     }
     return true;
 }
+/*
+ * function to check if comment array contains cid.
+ */
 function contains_comment_id($comments,$cid)
 {
     foreach($comments as $index => $obj)
@@ -138,7 +140,7 @@ function contains_comment_id($comments,$cid)
         else
         {
             $return = contains_comment_id($obj->children,$cid);
-            if($return == true)
+            if($return === true)
             {
                 return $return;
             }

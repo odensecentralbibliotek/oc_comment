@@ -339,7 +339,7 @@ function bindEditajax()
                     //Show the Login in a dialog.
                     var tmp = e.currentTarget.getAttribute('id');
                     var old_text = jQuery(e.currentTarget).parent().parent().find('.comment_content')
-                            .text().replaceAll('\n','\r\n\r\n');
+                            .text();
                     Drupal.settings.oc_comment.selected_comment = tmp;
                     Drupal.settings.oc_comment.selected_comment_old_text = old_text;
                     var tmp = jQuery(msg);
@@ -347,7 +347,7 @@ function bindEditajax()
                     formbox.html(msg);
                     formbox.fadeIn("slow");
                     var tmp = jQuery('#edit_comment_message');
-                    tmp.html(old_text);
+                    tmp.text(old_text);
                     tmp.trigger('keyup');
                 });
         return false;
@@ -369,7 +369,7 @@ function bindEditajax()
                     //did we submit with success ?
                     var tmp = jQuery('#comment-' + comment_edit_id);
                     var tmp2 = tmp.find('.comment_content');
-                    tmp2.text(msg.comment_body.und[0].value);
+                    tmp2.html(msg.comment_body.und[0].value);
                     var comment = tmp;
                     var formbox = comment.find('.oc-comment-form-box');
                     formbox.fadeOut("slow");

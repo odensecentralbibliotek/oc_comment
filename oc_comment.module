@@ -163,7 +163,6 @@ function oc_comment_block_view($delta='') {
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/oc_comments.js');
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/jquery.pulsate.js');
         drupal_add_css(drupal_get_path('module', 'oc_comment') . '/css/oc_comment.css');
-        
         /*
          * Display a block.
          */
@@ -465,10 +464,12 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
     //only people with the propers rigths should be able to edit.
     if(user_access('administer comments') ||  $entity->uid == $user->uid)
     {
-        if($entity->comment_body[LANGUAGE_NONE][0]['value'] != $_GET['comment_body'])
+        $entity_wrap = entity_metadata_wrapper('comment',  $entity);
+        if($entity_wrap->comment_body->value() != $_GET['comment_body'])
         {
-            $entity->comment_body[LANGUAGE_NONE][0]['value'] =  check_plain($_GET['comment_body']);
-            $entity_wrap = entity_metadata_wrapper('comment',  $entity);
+            
+            $entity_wrap->comment_body->set(check_plain($_GET['comment_body']));
+            $test = $entity_wrap->comment_body->value();
             if($entity_wrap->save())
             {
                 cache_set('oc_comments_data',null,'cache');
