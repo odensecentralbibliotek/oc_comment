@@ -309,7 +309,7 @@ function bindDeleteajax()
                     {
                         sibling.remove();
                     }
-                    comment.fadeOut(900, function () {
+                    formbox.fadeOut(900, function () {
                         jQuery('#' + Drupal.settings.oc_comment.selected_comment).parent().parent().remove();
                     });
                 });

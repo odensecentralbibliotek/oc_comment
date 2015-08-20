@@ -5,7 +5,7 @@ require_once('oc_comment_helpers.php');
 require_once('oc_comment.admin.php');
 
 function oc_comment_menu() {
-     $items['admin/oc/comments/config'] = array(
+    $items['admin/oc/comments/config'] = array(
 
     'description' => 'Configuration for the oc_comment module',
     'page callback' => 'drupal_get_form',
@@ -14,22 +14,14 @@ function oc_comment_menu() {
      'type' => MENU_CALLBACK,    
   );
     
-    $items['oc/comments/ajax/get'] = array(
+   $items['oc/comments/ajax/get'] = array(
     'page callback' => 'oc_comment_block_view', // Render HTML
     'description' => 'ajax load of comments',
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
    );
-   /* 
-  $items['oc/comments/save/ajax/%'] = array(
-    'page callback' => 'oc_comment_callback', // Render HTML
-    'description' => '',
-    'page arguments' => array(4),
-    'type' => MENU_CALLBACK,
-    'access arguments' => array('access content'),
-   );*/
-  
-    $items['oc/comments/ajax_form/login'] = array(
+    
+   $items['oc/comments/ajax_form/login'] = array(
     'page callback' => 'oc_comment_ajax_login_form', // Render HTML
     'description' => 'Opens Login box.',
     'type' => MENU_CALLBACK,
@@ -52,7 +44,7 @@ function oc_comment_menu() {
     'access callback' => 'oc_comments_user_check_validation'
    );
   
-    $items['oc/comments/ajax_form/edit'] = array(
+   $items['oc/comments/ajax_form/edit'] = array(
     'page callback' => 'oc_comment_ajax_edit_form', // Render HTML
     'description' => 'opens comment edit ajax popup.',
     'type' => MENU_CALLBACK,
@@ -68,7 +60,7 @@ function oc_comment_menu() {
     'access callback' => 'oc_comments_user_check_validation'
    );
   
-    $items['oc/comments/ajax_form/delete/submit/%'] = array(
+   $items['oc/comments/ajax_form/delete/submit/%'] = array(
     'page callback' => 'oc_comment_ajax_delete_submit_form', // Render HTML
     'description' => 'deletes comment',
     'page arguments' => array(5),
@@ -104,12 +96,6 @@ function oc_comment_block_info() {
     'info' => t('oc comments form'),
   );
   return $blocks;
-}
-/**
- * Implements hook_block_configure().
- */
-function oc_comment_block_configure($delta='') {
-   
 }
 /**
  * Implements hook_block_view().
@@ -172,7 +158,7 @@ function oc_comment_block_view($delta='') {
           {
             /*
              * Fetch all the comments and create the render data.
-             * caching is used for faster turns.
+             * caching is used for faster comments.
              */
             $Comments_render_arrary = &drupal_static(__FUNCTION__);
             if (!isset($oc_comments_data)) { 

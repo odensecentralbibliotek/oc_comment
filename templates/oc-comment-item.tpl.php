@@ -19,7 +19,7 @@
     $wrap_classes[] = "comment";
     $wrap_classes[] = $entity->parent->status == 0 ? 'oc-comment-approval-required' : 'oc-comment-approved';
     $wrap_classes[] = ($is_child == true ? 'oc_comment_child' : 'oc_comment_parent');
-
+    
     $html.= "<div name='comment-{$entity->parent->cid}' id='comment-" . $entity->parent->cid . "' class='" . implode(' ', $wrap_classes) . "'>";
     foreach ($comment_user->roles as $roles) {
         if (in_array($roles, $site_admin_roles)) {
@@ -32,7 +32,7 @@
     $html.= "<input type='hidden' id='comment_level' value='" . $current_level . "' />\n";
     $html.= "<input type='hidden' id='comment_id' value='" . $entity->parent->cid . "' />\n";
     $html.= "<input type='hidden' id='comment_count' value='" . sizeof($entity->children) . "' />\n";
-    $html.= "<div class='submitted'><b>" . $full_name . "</b> - " . date("d-m-Y H:i", $entity->parent->created) . "</div>\n";
+    $html.= "<div class='comment_submit_user'><img class='comment_profile_image' src='http://sport2000skijumping-team.com/assets/anon_user-7c89cad32615ac1c62aa1a80a3ff2db7.png'><b>" . $full_name . "</b> - " . date("d-m-Y H:i", $entity->parent->created) . "</div>\n";
     $html.= "<div class='comment_content'>";
     if(variable_get('comment_subject_field_' . $node->type, 0))
     {
@@ -57,6 +57,8 @@
 
     $html.= "</div>\n";
     $html .= "<div class='oc-comment-form-box'></div>\n";
-    $html .= "</div>";
+    $html .= "</div>"; //comment end
+    
+       
     echo $html;
 
