@@ -1,5 +1,5 @@
 # oc_comment
-Builds on the original comments module but adds several new features.
+Builds on the original comments module but adds/changes several new features.
 
 1. Works better with panels.
 2. Simplified threading.
