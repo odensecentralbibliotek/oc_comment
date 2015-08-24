@@ -1,7 +1,7 @@
 # oc_comment
 Builds on the original comments module but adds several new features.
 
-1. Works on panels.
+1. Works better with panels.
 2. Simplified threading.
 3. Enabled or disable comment/reply size limit with dynamic counter.
 4. Rules based notifcations.
@@ -9,3 +9,9 @@ Builds on the original comments module but adds several new features.
 7. Hide or show comment replies by default.
 8. Uses ajax based pageing
 9. Ajax based reply/edit/delete/publish
+
+how to use:
+
+Enable the module and add the two blocks to the panels where you want to show comments.
+For sites that do not use panels additional work may be required to hide the original comment module.
+
