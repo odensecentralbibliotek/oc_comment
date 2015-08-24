@@ -1,5 +1,5 @@
 # Odense central library comment module.
-Builds on the original comments module but adds/changes several new features.
+Builds on the original comments module but adds/changes several features.
 
 1. Works better with panels.
 2. Simplified threading.
