@@ -2,7 +2,9 @@
 
 function oc_comment_config_form() {
     $form = array();
-
+    /*
+     * Employee logo
+     */
     $form['oc_comments_fieldset_logo'] = array(
         '#type' => 'fieldset',
         '#title' => t('Employee banner Settings'),
@@ -17,7 +19,6 @@ function oc_comment_config_form() {
         $url = file_create_url($uri);
         variable_set('oc_comment_file_path', $url);
     }
-
     $form['oc_comments_fieldset_logo']['oc_comment_file_path'] = array(
         '#type' => 'textfield',
         '#title' => t('image file:'),
@@ -48,6 +49,56 @@ function oc_comment_config_form() {
             ),
         ),
     );
+     /*
+     * Default user logo
+     */
+    $form['oc_comments_fieldset_user_profile_image'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('User default image Settings'),
+        '#weight' => 0,
+        '#collapsible' => TRUE,
+        '#collapsed' => true,
+    );
+    
+    $user_profile_uploaded_image = variable_get('oc_comments_profile_logo', '');
+    if ($user_profile_uploaded_image != '') {
+        $file = file_load(variable_get('oc_comments_profile_logo'));
+        $uri = $file->uri;
+        $url = file_create_url($uri);
+        variable_set('oc_comment_profile_logo_file_path', $url);
+    }
+     $form['oc_comments_fieldset_user_profile_image']['oc_comment_profile_logo_file_path'] = array(
+        '#type' => 'textfield',
+        '#title' => t('User profile image file:'),
+        '#default_value' => variable_get('oc_comment_profile_logo_file_path', ''),
+        '#size' => 150,
+        '#description' => t("image file name."),
+    );
+    $form['oc_comments_fieldset_user_profile_image']['oc_comments_profile_logo'] = array(
+        '#type' => 'media',
+        '#title' => t('Choose a file'),
+        '#description' => t('Choose a file'),
+        '#tree' => TRUE,
+        '#input' => TRUE,
+        '#media_options' => array(
+            'global' => array(
+                'types' => array(
+                    'image' => 'image'
+                ),
+                'schemes' => array(
+                    'public' => 'public',
+                ),
+                'enabledPlugins' => array(
+                    'upload' => 'upload',
+                    'media_default--media_browser_my_files',
+                    'media_default--media_browser_1',
+                ),
+            ),
+        ),
+    );
+    /*
+     * Rules logo
+     */
     $form['oc_comment_rules_link'] = array(
         '#type' => 'textfield',
         '#title' => t('Kommentar skrivnings regler:'),
@@ -57,7 +108,7 @@ function oc_comment_config_form() {
     /*
      * Email forms
      */
-    $form['oc_comments_fieldset_mailset'] = array(
+   /* $form['oc_comments_fieldset_mailset'] = array(
         '#type' => 'fieldset',
         '#title' => t('Mail settings'),
         '#weight' => 0,
@@ -77,11 +128,11 @@ function oc_comment_config_form() {
         '#weight' => 1,
         '#collapsible' => TRUE,
         '#collapsed' => true,
-    );
+    );*/
     /*
      * New comment email body and title
      */
-    $form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['new_comment'] = array(
+    /*$form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['new_comment'] = array(
         '#type' => 'fieldset',
         '#title' => t('New Comment Email'),
         '#weight' => 0,
@@ -102,11 +153,11 @@ function oc_comment_config_form() {
         '#name' => 'email_new_comment_body',
         '#id' => 'email_new_comment_body',
         '#attributes' => array('placeholder' => t('New comment email body')),
-    );
+    );*/
     /*
      * Comment published email body and title
      */
-    $form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['new_published_comment'] = array(
+    /*$form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['new_published_comment'] = array(
         '#type' => 'fieldset',
         '#title' => t('Comment Published Email'),
         '#weight' => 0,
@@ -128,12 +179,12 @@ function oc_comment_config_form() {
         '#name' => 'email_published_comment_body',
         '#id' => 'email_published_comment_body',
         '#attributes' => array('placeholder' => t('New comment email body')),
-    );
+    );*/
 
     /*
      * Comment deleted email body and title
      */
-    $form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['deleted_comment'] = array(
+    /*$form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['deleted_comment'] = array(
         '#type' => 'fieldset',
         '#title' => t('Comment Deleted Email'),
         '#weight' => 0,
@@ -155,19 +206,19 @@ function oc_comment_config_form() {
         '#name' => 'email_deleted_comment_body',
         '#id' => 'email_deleted_comment_body',
         '#attributes' => array('placeholder' => t('New comment email body')),
-    );
+    );*/
 
     /*
      * Email replacement patterns
      */
-    $form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['token_tree'] = array(
+    /*$form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['token_tree'] = array(
         '#type' => 'fieldset',
         '#title' => t('Replacement patterns'),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
         '#description' => theme('token_tree', array('token_types' => array('current-user'))),
         '#weight' => 10,
-    );
+    );*/
     return system_settings_form($form);
 }
 

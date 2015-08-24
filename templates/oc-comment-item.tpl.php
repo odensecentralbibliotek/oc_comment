@@ -10,6 +10,7 @@
     $node = node_load($entity->parent->nid);
     $comment_user = user_load($entity->parent->uid);
     $full_name = isset($comment_user->data['display_name']) ? $comment_user->data['display_name'] : $comment_user->name;
+    $user_profile_image = variable_get('oc_comment_profile_logo_file_path', '');
     /*
      * Check if user is employee/admin and add logo to top right of comment box.
      * makes it all look more official :)
@@ -32,7 +33,7 @@
     $html.= "<input type='hidden' id='comment_level' value='" . $current_level . "' />\n";
     $html.= "<input type='hidden' id='comment_id' value='" . $entity->parent->cid . "' />\n";
     $html.= "<input type='hidden' id='comment_count' value='" . sizeof($entity->children) . "' />\n";
-    $html.= "<div class='comment_submit_user'><img class='comment_profile_image' src='http://sport2000skijumping-team.com/assets/anon_user-7c89cad32615ac1c62aa1a80a3ff2db7.png'><b>" . $full_name . "</b> - " . date("d-m-Y H:i", $entity->parent->created) . "</div>\n";
+    $html.= "<div class='comment_submit_user'><img class='comment_profile_image' src='{$user_profile_image}'><b>" . $full_name . "</b> - " . date("d-m-Y H:i", $entity->parent->created) . "</div>\n";
     $html.= "<div class='comment_content'>";
     if(variable_get('comment_subject_field_' . $node->type, 0))
     {
