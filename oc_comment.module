@@ -162,14 +162,14 @@ function oc_comment_block_view($delta='') {
              */
             $Comments_render_arrary = &drupal_static(__FUNCTION__);
             if (!isset($oc_comments_data)) { 
-                $cache = cache_get('oc_comments_data');
+                $cache = cache_get('oc_comments_data' . "_".$node->nid);
                 if (isset($cache->data) && is_array($cache->data)) {
                     $Comments_render_arrary = $cache->data;
                   }
                   else
                   {
                       $Comments_render_arrary = oc_comments_build_comment_array($node);
-                      cache_set('oc_comments_data',$Comments_render_arrary,'cache');
+                      cache_set('oc_comments_data'. "_".$node->nid,$Comments_render_arrary,'cache');
                   }
             }
             else
@@ -435,7 +435,7 @@ function oc_comment_ajax_reply_submit_form($nodeid,$parentid,$comment_body,$curr
         $obj->children = array();
         $is_child = $comment->pid == 0 ? false: true;
         $comment->markup = render_single_comment_entity($obj,$current_level,$is_child );
-        cache_set('oc_comments_data',null,'cache');
+        cache_set('oc_comments_data' . "_" .$nodeid,null,'cache');
         drupal_json_output($comment);
     }
     drupal_exit();
@@ -458,7 +458,7 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
             $test = $entity_wrap->comment_body->value();
             if($entity_wrap->save())
             {
-                cache_set('oc_comments_data',null,'cache');
+                cache_set('oc_comments_data'. "_" . $entity->nid,null,'cache');
                 drupal_json_output($entity);
                 drupal_exit();
             }
@@ -489,17 +489,17 @@ function oc_comment_ajax_delete_submit_form($cid)
      * see: http://www.drupalcontrib.org/api/drupal/contributions!entity!entity.module/function/entity_delete_multiple/7
      */
      global $user;
-     $node = node_load($cid);
+     $entity = reset(entity_load('comment',array($cid)));
      //make sure user has rigths to delete the comment ?
     $success = false;
     if(user_access('administer comments') || $node->uid == $user->uid)
     {
         $success = oc_comment_recursive_delete($cid);
-        cache_set('oc_comments_data',null,'cache');
+        cache_set('oc_comments_data'."_".$entity->nid,null,'cache');
     }
     if($success)
     {
-        cache_set('oc_comments_data',null,'cache');
+        cache_set('oc_comments_data'."_".$entity->nid,null,'cache');
         echo "1";
     }
     else
@@ -520,7 +520,7 @@ function oc_comment_ajax_approve_comment($cid)
         //approve comment :)
     if($entity_wrap->save())
     {
-        cache_set('oc_comments_data',null,'cache');
+        cache_set('oc_comments_data' . "_" . $entity->nid,null,'cache');
         echo "1";
     }
     else
