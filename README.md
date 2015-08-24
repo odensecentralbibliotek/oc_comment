@@ -2,7 +2,7 @@
 Builds on the original comments module but adds/changes several features.
 
 1. Works better with panels.
-2. Simplified threading.
+2. Simplified threading (migth eventual used van-numbers , but they seem overly complex compared with gains).
 3. Enabled or disable comment/reply size limit with dynamic counter.
 4. Rules based notifcations.
 6. Allows sorting of top level and child comments(ASC or DESC).
