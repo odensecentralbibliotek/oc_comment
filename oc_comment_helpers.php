@@ -36,11 +36,12 @@ function oc_comments_build_comment_array($node) {
         $Child_level_sort = variable_get('oc_comment_child_level_sort_' . $node->type, 'ASC');
         $child_nodes = db_query("SELECT * FROM comment WHERE nid = :nid AND pid = :pid  ORDER BY created {$Child_level_sort}", array(':nid' => $node->nid, ':pid' => $top_comment->cid));
         $child_nodes = $child_nodes->fetchAll();
+        
+        $obj_comments = new stdClass;
+        $obj_comments->parent = $top_comment;
+        $obj_comments->children = array();
+        
         if (sizeof($child_nodes)) {
-            $obj_comments = new stdClass;
-            $obj_comments->parent = $top_comment;
-            $obj_comments->children = array();
-
             //add the children
             foreach ($child_nodes as $index => $value) {
                 $obj_child = new stdClass;
@@ -52,9 +53,6 @@ function oc_comments_build_comment_array($node) {
             //Add the container
             $Comments_render_arrary[$top_comment->cid] = $obj_comments;
         } else {
-            $obj_comments = new stdClass;
-            $obj_comments->parent = $top_comment;
-            $obj_comments->children = array();
             $Comments_render_arrary[$top_comment->cid] = $obj_comments;
         }
     }
@@ -64,7 +62,6 @@ function oc_comments_build_comment_array($node) {
 /*
  * Retrive the body of the given comment from the related field table.
  */
-
 function oc_comment_get_comment_body($cid) {
     if (!isset($cid) || $cid == '') {
         return "";
