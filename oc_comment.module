@@ -1,5 +1,4 @@
 <?php
-
 require_once('oc_comment_forms.php');
 require_once('oc_comment_helpers.php');
 require_once('oc_comment.admin.php');
@@ -179,7 +178,7 @@ function oc_comment_block_view($delta='') {
             /*
              * Render the comment data array.
              */
-            $block['content'] = GenerateHtmlContent($Comments_render_arrary,$node);
+            $block['content'] = sizeof( $Comments_render_arrary) > 0 ? GenerateHtmlContent($Comments_render_arrary,$node): '';
             break;
           }
           case 'oc_comments_form_submit_block' :
