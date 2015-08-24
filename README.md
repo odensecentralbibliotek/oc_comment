@@ -1,4 +1,4 @@
-# oc_comment
+# Odense central library comment module.
 Builds on the original comments module but adds/changes several new features.
 
 1. Works better with panels.
