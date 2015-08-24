@@ -8,4 +8,4 @@ Builds on the original comments module but adds several new features.
 6. Allows sorting of top level and child comments(ASC or DESC).
 7. Hide or show comment replies by default.
 8. Uses ajax based pageing
-9. ajax based reply/edit/delete/publish
+9. Ajax based reply/edit/delete/publish
