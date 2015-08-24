@@ -178,7 +178,7 @@ function oc_comment_block_view($delta='') {
             /*
              * Render the comment data array.
              */
-            $block['content'] = sizeof( $Comments_render_arrary) > 0 ? GenerateHtmlContent($Comments_render_arrary,$node): '';
+            $block['content'] = sizeof( $Comments_render_arrary) > 0 ? GenerateHtmlContent($Comments_render_arrary,$node): theme('oc_comment_wrap',array('wrap_data' => ''));
             break;
           }
           case 'oc_comments_form_submit_block' :
