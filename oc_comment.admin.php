@@ -282,7 +282,7 @@ function oc_comment_form_node_type_form_alter(&$form, $form_state) {
      * the conversation , instead of scrolling to the bottom to get the
      * red line.
      */
-    $form['comment']['oc_comment_child_level'] = array(
+    $form['comment']['oc_comment_child_level_sort'] = array(
         '#type' => 'select',
         '#title' => t('Sorting of child level comments'),
         '#default_value' => variable_get('oc_comment_child_level_sort_' . $form['#node_type']->type, 'ASC'),

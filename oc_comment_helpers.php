@@ -30,10 +30,11 @@ function oc_comments_build_comment_array($node) {
      */
     $Comments_render_arrary = array();
     $Top_level_sort = variable_get('oc_comment_top_level_sort_' . $node->type, 'DESC');
+    $Child_level_sort = variable_get('oc_comment_child_level_sort_' . $node->type, 'ASC');
     $result = db_query("SELECT * FROM comment WHERE nid = :nid AND pid = 0  ORDER BY created {$Top_level_sort} ", array(':nid' => $node->nid));
     foreach ($result as $index => $top_comment) {
         //Find all children og the current top node.
-        $Child_level_sort = variable_get('oc_comment_child_level_sort_' . $node->type, 'ASC');
+        
         $child_nodes = db_query("SELECT * FROM comment WHERE nid = :nid AND pid = :pid  ORDER BY created {$Child_level_sort}", array(':nid' => $node->nid, ':pid' => $top_comment->cid));
         $child_nodes = $child_nodes->fetchAll();
         

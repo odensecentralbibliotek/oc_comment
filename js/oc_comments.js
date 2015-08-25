@@ -63,7 +63,14 @@ function bind_form_submit()
                     if(Drupal.settings.oc_comment.skip_approval)
                     {
                         jQuery(".submit-form-error-message").append('<div class="messages status">Comment Postet</div>');
-                        jQuery('#oc-comments-wrap').prepend(msg.markup);
+                        if(Drupal.settings.oc_comment.top_level_comment_sort === "DESC")
+                        {
+                            jQuery('#oc-comments-wrap').prepend(msg.markup);
+                        }
+                        else
+                        {
+                            jQuery('#oc-comments-wrap').append(msg.markup);
+                        }
                     }
                     else
                     {
@@ -214,7 +221,14 @@ function InsertCommentReply(comment)
             var new_elem = jQuery(comment.markup);
             new_elem.hide();
             //new_elem.toggle();
-            sibling.append(new_elem);
+            if(Drupal.settings.oc_comment.child_level_comment_sort === "DESC")
+            {
+                sibling.prepend(new_elem);
+            }
+            else
+            {
+                sibling.append(new_elem);
+            }
             if (sibling.is(':hidden'))
             {
                 sibling.fadeIn("slow");
