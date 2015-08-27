@@ -63,7 +63,7 @@ function bind_form_submit()
                     if(Drupal.settings.oc_comment.skip_approval)
                     {
                         jQuery(".submit-form-error-message").append('<div class="messages status">Comment Postet</div>');
-                        if(Drupal.settings.oc_comment.top_level_comment_sort === "DESC")
+                        if(Drupal.settings.oc_comment.top_level_comment_sort == "DESC")
                         {
                             jQuery('#oc-comments-wrap').prepend(msg.markup);
                         }

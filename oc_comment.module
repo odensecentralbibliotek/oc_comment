@@ -1,6 +1,6 @@
 <?php
-require_once('oc_comment_forms.php');
-require_once('oc_comment_helpers.php');
+require_once('includes/oc_comment_forms.inc');
+require_once('includes/oc_comment_helpers.inc');
 require_once('oc_comment.admin.php');
 
 function oc_comment_menu() {
@@ -142,9 +142,9 @@ function oc_comment_block_view($delta='') {
         $setting = array('oc_comment' => array('currentNid' => $node->nid
                 ,'skip_approval' => $skip_approval
                 ,'max_reply_length' => $max_reply_length,
-                'reply_limit_active' => $reply_limit_active),
+                'reply_limit_active' => $reply_limit_active,
                 'top_level_comment_sort' => variable_get('oc_comment_top_level_sort_' . $node->type, 'DESC'),
-                'child_level_comment_sort' => variable_get('oc_comment_child_level_sort_' . $node->type, 'ASC'));
+                'child_level_comment_sort' => variable_get('oc_comment_child_level_sort_' . $node->type, 'ASC')));
        
         drupal_add_js($setting, 'setting');
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/oc_comments.js');

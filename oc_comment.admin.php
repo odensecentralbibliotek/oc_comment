@@ -26,7 +26,6 @@ function oc_comment_config_form() {
         '#size' => 150,
         '#description' => t("image file name."),
     );
-
     $form['oc_comments_fieldset_logo']['oc_comments_logo'] = array(
         '#type' => 'media',
         '#title' => t('Choose a file'),
@@ -221,7 +220,10 @@ function oc_comment_config_form() {
     );*/
     return system_settings_form($form);
 }
-
+/*
+ *  Extend comment form with more options.
+ * 
+ */
 function oc_comment_form_node_type_form_alter(&$form, $form_state) {
     /*
      * How many levels of comments are available ?
@@ -307,7 +309,6 @@ function oc_comment_form_node_type_form_alter(&$form, $form_state) {
 /*
  * Hook to make ding users real name appear i admin comment manager.
  */
-
 function oc_comment_views_pre_render(&$view) {
     if ($view->name == "admin_views_comment") {
         foreach ($view->result as $index => $comment_data) {
@@ -320,3 +321,7 @@ function oc_comment_views_pre_render(&$view) {
         }
     }
 }
+/*
+ * When searching via views exsposed filter on the comment admin view
+ * Users real names should be searchable. write hook here:
+ */
