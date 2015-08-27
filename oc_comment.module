@@ -273,7 +273,7 @@ function GenerateHtmlContent($comments,$node)
     }
     $html .= theme('pager', array('quantity',count($comments)));
     $html = theme('oc_comment_wrap',array('wrap_data' => $html));
-    
+
     //restore setting when viewing normaly.
     if($disable_comment_folding_temp)
     {
