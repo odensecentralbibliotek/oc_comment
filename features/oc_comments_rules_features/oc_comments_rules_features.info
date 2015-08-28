@@ -1,0 +1,15 @@
+name = OC Comments Rules Features
+description = Indeholder regler som er nødvendige for oc_comments
+core = 7.x
+package = Features
+version = 7.x-1.0
+project = oc_comments_rules_features
+dependencies[] = cache_actions
+dependencies[] = comment
+dependencies[] = entity
+dependencies[] = rules
+features[features_api][] = api:1
+features[rules_config][] = rules_comment_delete
+features[rules_config][] = rules_comment_publish
+features[rules_config][] = rules_comment_unpublish
+features[rules_config][] = rules_new_comment

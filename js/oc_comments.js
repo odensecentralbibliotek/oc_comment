@@ -63,37 +63,40 @@ function bind_form_submit()
                     if(Drupal.settings.oc_comment.skip_approval)
                     {
                         jQuery(".submit-form-error-message").append('<div class="messages status">Comment Postet</div>');
-                        var new_elem = jQuery(msg.markup);
-                        new_elem.hide();
-                        if(Drupal.settings.oc_comment.top_level_comment_sort == "DESC")
-                        {
-                            jQuery('#oc-comments-wrap').prepend(new_elem);
-                        }
-                        else
-                        {
-                            var page_count = jQuery('.pager li').length;
-                            var goto_first_btn_exits = jQuery('.pager-first').length;
-                            if(!goto_first_btn_exits &&  page_count<= 1)
-                            {
-                               jQuery('#oc-comments-wrap').append(new_elem);
-                            }
-                            //If we are on page 0 insert , else dont.
-                            
-                        }
-                        new_elem.fadeIn("slow");
-                        new_elem.pulsate({
-                            reach: 20, // how far the pulse goes in px
-                            speed: 1000, // how long one pulse takes in ms
-                            pause: 0, // how long the pause between pulses is in ms
-                            glow: true, // if the glow should be shown too
-                            repeat: 1, // will repeat forever if true, if given a number will repeat for that many times
-                            onHover: false                          // if true only pulsate if user hovers over the element
-                        });
+                        
                     }
                     else
                     {
                         jQuery(".submit-form-error-message").append('<div class="messages status">Comment awaiting admin approval</div>');
                     }
+                    var new_elem = jQuery(msg.markup);
+                    new_elem.hide();
+                    if(Drupal.settings.oc_comment.top_level_comment_sort == "DESC")
+                    {
+                        jQuery('#oc-comments-wrap').prepend(new_elem);
+                    }
+                    else
+                    {
+                        var page_count = jQuery('.pager li').length;
+                        var goto_first_btn_exits = jQuery('.pager-first').length;
+                        if(!goto_first_btn_exits &&  page_count<= 1)
+                        {
+                           jQuery('#oc-comments-wrap').append(new_elem);
+                        }
+                        //If we are on page 0 insert , else dont.
+                    }
+                    new_elem.fadeIn("slow");
+                    new_elem.pulsate({
+                        reach: 20, // how far the pulse goes in px
+                        speed: 1000, // how long one pulse takes in ms
+                        pause: 0, // how long the pause between pulses is in ms
+                        glow: true, // if the glow should be shown too
+                        repeat: 1, // will repeat forever if true, if given a number will repeat for that many times
+                        onHover: false                          // if true only pulsate if user hovers over the element
+                    });
+                    //reset word limit:
+                    jQuery('.oc_comment_word_limit').html(Drupal.settings.oc_comment.max_reply_length);
+                    
                     jQuery('#reply_comment_submit_subject').val(null);
                     jQuery('#reply_comment_submit_message').val(null);
                 });
