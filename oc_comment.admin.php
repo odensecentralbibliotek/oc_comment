@@ -58,7 +58,6 @@ function oc_comment_config_form() {
         '#collapsible' => TRUE,
         '#collapsed' => true,
     );
-    
     $user_profile_uploaded_image = variable_get('oc_comments_profile_logo', '');
     if ($user_profile_uploaded_image != '') {
         $file = file_load(variable_get('oc_comments_profile_logo'));
@@ -103,121 +102,6 @@ function oc_comment_config_form() {
         '#title' => t('Kommentar skrivnings regler:'),
         '#default_value' => variable_get('oc_comment_rules_link', null),
     );
-
-    /*
-     * Email forms
-     */
-   /* $form['oc_comments_fieldset_mailset'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('Mail settings'),
-        '#weight' => 0,
-        '#collapsible' => TRUE,
-    );
-    $form['oc_comments_fieldset_mailset']['oc_comment_backup_emails'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Backup Emails:'),
-        '#default_value' => variable_get('oc_comment_backup_emails', ''),
-        '#size' => 150,
-        '#description' => t("comma seperated list of emails to send info emails too"),
-    );
-
-    $form['oc_comments_fieldset_mailset']['oc_comments_mail_data'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('Email Messages'),
-        '#weight' => 1,
-        '#collapsible' => TRUE,
-        '#collapsed' => true,
-    );*/
-    /*
-     * New comment email body and title
-     */
-    /*$form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['new_comment'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('New Comment Email'),
-        '#weight' => 0,
-        '#collapsible' => TRUE,
-        '#collapsed' => true,
-    );
-    $form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['new_comment']['oc_comments_email_new_comment_title'] = array(
-        '#type' => 'textfield',
-        '#title' => t('email title:'),
-        '#default_value' => variable_get('oc_comments_email_new_comment_title', ''),
-        '#size' => 150,
-        '#description' => t("Email title"),
-    );
-    $form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['new_comment']['oc_comments_email_new_comment_body'] = array(
-        '#type' => 'textarea', //you can find a list of available types in the form api
-        '#size' => 50,
-        '#required' => TRUE, //make this field required
-        '#name' => 'email_new_comment_body',
-        '#id' => 'email_new_comment_body',
-        '#attributes' => array('placeholder' => t('New comment email body')),
-    );*/
-    /*
-     * Comment published email body and title
-     */
-    /*$form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['new_published_comment'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('Comment Published Email'),
-        '#weight' => 0,
-        '#collapsible' => TRUE,
-        '#collapsed' => true,
-    );
-    $form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['new_published_comment']['oc_comments_email_published_comment_title'] = array(
-        '#type' => 'textfield',
-        '#title' => t('email title:'),
-        '#default_value' => variable_get('oc_comments_email_published_comment_title', ''),
-        '#size' => 150,
-        '#description' => t("Email title"),
-    );
-
-    $form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['new_published_comment']['oc_comments_email_published_comment_body'] = array(
-        '#type' => 'textarea', //you can find a list of available types in the form api
-        '#size' => 50,
-        '#required' => TRUE, //make this field required
-        '#name' => 'email_published_comment_body',
-        '#id' => 'email_published_comment_body',
-        '#attributes' => array('placeholder' => t('New comment email body')),
-    );*/
-
-    /*
-     * Comment deleted email body and title
-     */
-    /*$form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['deleted_comment'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('Comment Deleted Email'),
-        '#weight' => 0,
-        '#collapsible' => TRUE,
-        '#collapsed' => true,
-    );
-    $form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['deleted_comment']['oc_comments_email_deleted_comment_title'] = array(
-        '#type' => 'textfield',
-        '#title' => t('email title:'),
-        '#default_value' => variable_get('oc_comments_email_published_comment_title', ''),
-        '#size' => 150,
-        '#description' => t("Email title"),
-    );
-
-    $form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['deleted_comment']['oc_comments_email_deleted_comment_body'] = array(
-        '#type' => 'textarea', //you can find a list of available types in the form api
-        '#size' => 50,
-        '#required' => TRUE, //make this field required
-        '#name' => 'email_deleted_comment_body',
-        '#id' => 'email_deleted_comment_body',
-        '#attributes' => array('placeholder' => t('New comment email body')),
-    );*/
-
-    /*
-     * Email replacement patterns
-     */
-    /*$form['oc_comments_fieldset_mailset']['oc_comments_mail_data']['token_tree'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('Replacement patterns'),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-        '#description' => theme('token_tree', array('token_types' => array('current-user'))),
-        '#weight' => 10,
-    );*/
     return system_settings_form($form);
 }
 /*
@@ -321,7 +205,3 @@ function oc_comment_views_pre_render(&$view) {
         }
     }
 }
-/*
- * When searching via views exsposed filter on the comment admin view
- * Users real names should be searchable. write hook here:
- */

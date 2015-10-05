@@ -200,8 +200,8 @@ form#oc-comment-comment-submit-form div a.oc-comments-terms-links
     padding: 10px;
     color: black;
     border-radius: 4px;
-    float: right;
+    float: left;
     margin-left: 3px;
     margin-top: 5px;
-    font-size: 17px;
+    font-size: 12px;
 }

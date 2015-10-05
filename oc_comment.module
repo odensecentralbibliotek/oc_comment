@@ -96,7 +96,7 @@ function oc_comment_block_info() {
   );
   return $blocks;
 }
-/**
+/*
  * Implements hook_block_view().
  * Builds a better data structure and renders
  * the build in comments module is horrible to work with and the treading is poor at bedst.
@@ -129,24 +129,7 @@ function oc_comment_block_view($delta='') {
     }
     if($node->comment == COMMENT_NODE_OPEN)
     {
-        global $user;
-        $skip_approval = user_access('skip comment approval',$user) ? 1 : 0;
-        $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
-        $max_reply_level = variable_get('oc_comment_max_reply_level_'. $node->type, 0);
-        $reply_limit_active = variable_get('oc_comment_reply_limit_active_'.$node->type, 0);
-        $max_reply_length = variable_get('oc_comment_max_reply_length_'. $node->type, 250);
-        
-        /*
-         * Setup settings and include  the front-end javascript.
-         */
-        $setting = array('oc_comment' => array('currentNid' => $node->nid
-                ,'skip_approval' => $skip_approval
-                ,'max_reply_length' => $max_reply_length,
-                'reply_limit_active' => $reply_limit_active,
-                'top_level_comment_sort' => variable_get('oc_comment_top_level_sort_' . $node->type, 'DESC'),
-                'child_level_comment_sort' => variable_get('oc_comment_child_level_sort_' . $node->type, 'ASC')));
-       
-        drupal_add_js($setting, 'setting');
+
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/oc_comments.js');
         drupal_add_js(drupal_get_path('module', 'oc_comment') . '/js/jquery.pulsate.js');
         drupal_add_css(drupal_get_path('module', 'oc_comment') . '/css/oc_comment.css');
@@ -157,6 +140,24 @@ function oc_comment_block_view($delta='') {
         switch($delta) {
           case 'oc_comments_block' :
           {
+            global $user;
+            $skip_approval = user_access('skip comment approval',$user) ? 1 : 0;
+            $mode = variable_get('comment_default_mode_' . $node->type, COMMENT_MODE_THREADED);
+            $max_reply_level = variable_get('oc_comment_max_reply_level_'. $node->type, 0);
+            $reply_limit_active = variable_get('oc_comment_reply_limit_active_'.$node->type, 0);
+            $max_reply_length = variable_get('oc_comment_max_reply_length_'. $node->type, 250);
+
+            /*
+             * Setup settings and include  the front-end javascript.
+             */
+            $setting = array('oc_comment' => array('currentNid' => $node->nid
+                    ,'skip_approval' => $skip_approval
+                    ,'max_reply_length' => $max_reply_length,
+                    'reply_limit_active' => $reply_limit_active,
+                    'top_level_comment_sort' => variable_get('oc_comment_top_level_sort_' . $node->type, 'DESC'),
+                    'child_level_comment_sort' => variable_get('oc_comment_child_level_sort_' . $node->type, 'ASC')));
+
+            drupal_add_js($setting, 'setting');
             /*
              * Fetch all the comments and create the render data.
              * caching is used for faster comments.
