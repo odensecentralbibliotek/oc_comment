@@ -452,11 +452,11 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
     //only people with the propers rigths should be able to edit.
     if(user_access('administer comments') ||  $entity->uid == $user->uid)
     {
-        $entity_wrap = entity_metadata_wrapper('comment',  $entity);
-        if($entity_wrap->comment_body->value() != $_GET['comment_body'])
+         $test = $entity->comment_body[LANGUAGE_NONE][0]['value'];
+        if($entity->comment_body[LANGUAGE_NONE][0]['value'] != $_GET['comment_body'])
         {
-            
-            $entity_wrap->comment_body->set(check_plain($_GET['comment_body']));
+            $entity->comment_body[LANGUAGE_NONE][0]['value'] = $_GET['comment_body'];
+            $entity_wrap = entity_metadata_wrapper('comment',  $entity);
             $test = $entity_wrap->comment_body->value();
             if($entity_wrap->save())
             {
