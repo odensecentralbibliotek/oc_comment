@@ -337,31 +337,17 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null,$
         if($user->uid == $comment->uid)
         {
             /*
-             * User can post new/reply to comments.
-             * always check if the current level allows reply's !
-             *
+             * user who owns comment , can a always reply,edit,delete
              */
-            if(user_access('post comments')  && $current_level < variable_get('oc_comment_max_reply_level_'. $node->type, 1) && $comment->status != 0)
-            {
-                $button_html .= l(t('Reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
-                'id' => $comment->cid)));
-            }
-            /*
-             * User can edit his own comments.
-             */
-            if(user_access('edit own comments'))
-            {
-                $button_html .= l(t('Edit'),'',array('attributes' => array('class' => 'oc_comment_edit_btn oc_comment_btn',
-                 'id' => $comment->cid)));
-            }
-            /*
-             * User can post new/reply to comments.
-             */
-            if(user_access('administer comments'))
-            {
-                $button_html .= l(t('Delete'),'',array('attributes' => array('class' => 'oc_comment_delete_btn oc_comment_btn' ,
-                'id' => $comment->cid)));
-            }
+            $button_html .= l(t('Reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
+            'id' => $comment->cid)));
+            
+            $button_html .= l(t('Edit'),'',array('attributes' => array('class' => 'oc_comment_edit_btn oc_comment_btn',
+             'id' => $comment->cid)));
+            
+            $button_html .= l(t('Delete'),'',array('attributes' => array('class' => 'oc_comment_delete_btn oc_comment_btn' ,
+            'id' => $comment->cid)));
+            
         }
         else
         {
