@@ -195,6 +195,7 @@ function oc_comment_form_node_type_form_alter(&$form, $form_state) {
  */
 function oc_comment_views_pre_render(&$view) {
     if ($view->name == "admin_views_comment") {
+        drupal_set_message("Hit admin comment view", 'warning');
         foreach ($view->result as $index => $comment_data) {
             //is it a ding user ? without a proper name.
             //load the user
@@ -208,7 +209,8 @@ function oc_comment_views_pre_render(&$view) {
              */
             if($comment_data->field_comment_body[0]['raw']['value'] != $comment_data->field_comment_body[0]['rendered']['#markup'])
             {
-                $comment_data->field_comment_body[0]['rendered']['#markup'] = $comment_data->field_comment_body[0]['raw']['value'];
+                drupal_set_message("Swapped rendered with raw.", 'warning');
+                $comment_data->field_comment_body[0]['rendered']['#markup'] = $comment_data->field_comment_body[0]['raw']['value'];                
             }
         }
     }
