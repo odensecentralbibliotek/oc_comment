@@ -207,11 +207,7 @@ function oc_comment_views_pre_render(&$view) {
              * Fixup a bug where comment data is not being rendered for view
              * when postet on a page , but works fine for news items.
              */
-            if($comment_data->field_comment_body[0]['raw']['value'] != $comment_data->field_comment_body[0]['rendered']['#markup'])
-            {
-                drupal_set_message("Swapped rendered with raw.", 'warning');
-                $comment_data->field_comment_body[0]['rendered']['#markup'] = $comment_data->field_comment_body[0]['raw']['value'];                
-            }
+             $comment_data->field_comment_body[0]['rendered']['#markup'] = $comment_data->field_comment_body[0]['raw']['value'];                
         }
     }
 }
