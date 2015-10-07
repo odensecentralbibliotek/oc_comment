@@ -195,7 +195,6 @@ function oc_comment_form_node_type_form_alter(&$form, $form_state) {
  */
 function oc_comment_views_pre_render(&$view) {
     if ($view->name == "admin_views_comment") {
-        drupal_set_message("Hit admin comment view", 'warning');
         foreach ($view->result as $index => $comment_data) {
             //is it a ding user ? without a proper name.
             //load the user
