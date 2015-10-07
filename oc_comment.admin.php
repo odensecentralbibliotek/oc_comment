@@ -202,6 +202,14 @@ function oc_comment_views_pre_render(&$view) {
             if (isset($user->data['display_name'])) {
                 $comment_data->comment_name = $user->data['display_name'];
             }
+            /*
+             * Fixup a bug where comment data is not being rendered for view
+             * when postet on a page , but works fine for news items.
+             */
+            if($comment_data->field_comment_body[0]['raw']['value'] != $comment_data->field_comment_body[0]['rendered']['#markup'])
+            {
+                $comment_data->field_comment_body[0]['rendered']['#markup'] = $comment_data->field_comment_body[0]['raw']['value'];
+            }
         }
     }
 }
