@@ -25,7 +25,10 @@
     foreach ($comment_user->roles as $roles) {
         if (in_array($roles, $site_admin_roles)) {
             $logo_img = variable_get('oc_comment_file_path', 'https://odensebib.dk/sites/www.odensebib.dk/files/logo.png');
-            $html .= "<img title='Biblioteks ansat' id='comment_logo' src='{$logo_img}' />";
+            if($logo_img != "")
+            {
+                $html .= "<img title='Biblioteks ansat' id='comment_logo' src='{$logo_img}' />";
+            }
             break;
         }
     }
