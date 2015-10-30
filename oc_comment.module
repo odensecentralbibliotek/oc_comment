@@ -339,9 +339,12 @@ function oc_comment_get_buttons($comment,$current_level,$parent_comment = null,$
             /*
              * user who owns comment , can a always reply,edit,delete
              */
-            $button_html .= l(t('Reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
-            'id' => $comment->cid)));
-            
+            if($current_level < variable_get('oc_comment_max_reply_level_'. $node->type, 1))
+            {
+                $button_html .= l(t('Reply'),'',array('attributes' => array('class' => 'oc_comment_reply_btn oc_comment_btn',
+                'id' => $comment->cid)));
+            }
+
             $button_html .= l(t('Edit'),'',array('attributes' => array('class' => 'oc_comment_edit_btn oc_comment_btn',
              'id' => $comment->cid)));
             
@@ -442,6 +445,8 @@ function oc_comment_ajax_edit_submit_form($cid,$comment_body)
         if($entity->comment_body[LANGUAGE_NONE][0]['value'] != $_GET['comment_body'])
         {
             $entity->comment_body[LANGUAGE_NONE][0]['value'] = $_GET['comment_body'];
+            $entity->comment_body[LANGUAGE_NONE][0]['format'] = 3;
+            
             $entity_wrap = entity_metadata_wrapper('comment',  $entity);
             $test = $entity_wrap->comment_body->value();
             if($entity_wrap->save())
