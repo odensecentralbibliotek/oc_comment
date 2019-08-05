@@ -74,7 +74,6 @@ function oc_comments_rules_features_default_rules_configuration() {
   $items['rules_new_comment'] = entity_import('rules_config', '{ "rules_new_comment" : {
       "LABEL" : "New Comment",
       "PLUGIN" : "reaction rule",
-      "ACTIVE" : false,
       "REQUIRES" : [ "rules", "comment" ],
       "ON" : [ "comment_insert" ],
       "DO" : [
@@ -89,7 +88,7 @@ function oc_comments_rules_features_default_rules_configuration() {
           }
         },
         { "mail" : {
-            "to" : "tfpet@odense.dk",
+            "to" : "[user-entity:mail]",
             "subject" : "Ny kommentar",
             "message" : "Der er kommet en ny kommentar til \\u003Cb\\u003E\\u003Ca href=\\u0022[comment:url]\\u0022 target=\\u0022_blank\\u0022\\u003E[entity-fetched:title]\\u003C\\/a\\u003E\\u003C\\/b\\u003E\\u003Cbr\\/\\u003E\\r\\n\\u003Cb\\u003E[comment:name]\\u003C\\/b\\u003E Skriver:\\r\\n\\u003Ch2\\u003E[comment:title]\\u003C\\/h2\\u003E\\r\\n\\u003Cp\\u003E\\r\\n\\u0022[comment:body]\\u0022\\r\\n\\u003Cp\\u003E\\r\\n\\u003Cbr\\/\\u003E\\r\\nDu kan rediger kommentaren direkte \\u003Ca href=\\u0022[comment:edit-url]\\u0022\\u003Eher\\u003C\\/a\\u003E eller p\\u00e5 indholds siden direkte.",
             "language" : [ "" ]
